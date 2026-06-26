@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WelcomScreen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── THEMES ── */
+    body[data-theme="dark"] {
+      --bg: #0d1117; --bg2: #161b22;
+      --text: #f1f5f9; --muted: #94a3b8;
+      --accent: #6366f1; --accent2: #818cf8;
+    }
+    body[data-theme="light"] {
+      --bg: #f8fafc; --bg2: #e2e8f0;
+      --text: #0f172a; --muted: #64748b;
+      --accent: #4f46e5; --accent2: #6366f1;
+    }
+    body[data-theme="warm"] {
+      --bg: #1c0a00; --bg2: #451a03;
+      --text: #fef3c7; --muted: #d97706;
+      --accent: #f59e0b; --accent2: #fbbf24;
+    }
+    body[data-theme="ocean"] {
+      --bg: #062032; --bg2: #0c4a6e;
+      --text: #e0f2fe; --muted: #7dd3fc;
+      --accent: #0ea5e9; --accent2: #38bdf8;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    /* ── SLIDES ── */
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px;
+      opacity: 0;
+      transition: opacity .8s ease;
+      pointer-events: none;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* Message / custom */
+    .slide-title {
+      font-size: clamp(2.5rem, 7vw, 6rem);
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, var(--text), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .slide-body {
+      font-size: clamp(1.2rem, 3vw, 2.2rem);
+      font-weight: 400;
+      text-align: center;
+      color: var(--muted);
+      max-width: 800px;
+      line-height: 1.5;
+    }
+
+    /* Clock */
+    .clock-time {
+      font-size: clamp(5rem, 18vw, 16rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      line-height: 1;
+    }
+    .clock-date {
+      font-size: clamp(1.2rem, 3vw, 2.5rem);
+      color: var(--muted);
+      margin-top: 16px;
+      font-weight: 300;
+    }
+
+    /* Ephemeris */
+    .ephem-label {
+      font-size: clamp(.9rem, 2vw, 1.4rem);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      margin-bottom: 16px;
+    }
+    .ephem-name {
+      font-size: clamp(3rem, 10vw, 9rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    /* Image */
+    .slide-image {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      position: absolute; inset: 0;
+    }
+    .image-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.6) 0%, transparent 60%);
+    }
+    .image-caption {
+      position: absolute; bottom: 60px; left: 60px; right: 60px;
+      font-size: clamp(1.5rem, 4vw, 3.5rem);
+      font-weight: 700; color: #fff;
+    }
+
+    /* Weather */
+    .weather-city {
+      font-size: clamp(1rem, 2.5vw, 2rem);
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: .12em; margin-bottom: 8px;
+    }
+    .weather-temp {
+      font-size: clamp(5rem, 15vw, 12rem);
+      font-weight: 700; line-height: 1;
+      color: var(--text);
+    }
+    .weather-desc {
+      font-size: clamp(1.2rem, 3vw, 2.5rem);
+      color: var(--muted); margin-top: 12px;
+    }
+
+    /* ── PROGRESS BAR ── */
+    #progress-bar {
+      position: fixed; bottom: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      width: 0%; transition: width linear;
+      z-index: 100;
+    }
+
+    /* ── BRANDING ── */
+    #branding {
+      position: fixed; bottom: 16px; right: 20px;
+      font-size: 11px; color: var(--muted);
+      opacity: .4; letter-spacing: .05em;
+    }
+
+    /* ── ERROR / LOADER ── */
+    #loader {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 20px;
+      z-index: 200;
+    }
+    .loader-logo {
+      font-size: 48px; margin-bottom: 8px;
+    }
+    .loader-text { font-size: 16px; color: var(--muted); }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--bg2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #error-msg {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+    }
+    #error-msg h2 { font-size: 24px; color: #ef4444; }
+    #error-msg p  { font-size: 16px; color: var(--muted); }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <div id="loader">
+    <div class="loader-logo">📺</div>
+    <div class="spinner"></div>
+    <p class="loader-text">Chargement de l'affichage…</p>
+  </div>
+
+  <div id="error-msg">
+    <h2>⚠️ Écran introuvable</h2>
+    <p>Vérifiez le lien ou configurez votre établissement dans l'administration.</p>
+  </div>
+
+  <div id="slides-container"></div>
+  <div id="progress-bar"></div>
+  <div id="branding">WelcomScreen</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBGjPegcDDlqqrltWhhWaWHBxPw2JxYC2Q",
+  authDomain: "welcomscreen-b6bff.firebaseapp.com",
+  databaseURL: "https://welcomscreen-b6bff-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "welcomscreen-b6bff",
+  storageBucket: "welcomscreen-b6bff.firebasestorage.app",
+  messagingSenderId: "801754342081",
+  appId: "1:801754342081:web:26f60f9b66589e690daa40"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// ── Get storeId from URL ──
+const params  = new URLSearchParams(location.search);
+const storeId = params.get('store');
+
+if (!storeId) { showError(); } else { init(); }
+
+function init() {
+  const storeRef = ref(db, `stores/${storeId}`);
+  onValue(storeRef, snap => {
+    if (!snap.exists()) { showError(); return; }
+    const data = snap.val();
+    renderStore(data);
+  }, err => { showError(); });
+}
+
+// ── Ephemeris data (saints du jour) ──
+const SAINTS = {
+  "01-01":"Marie","01-02":"Basile","01-03":"Geneviève","01-04":"Odilon","01-05":"Édouard",
+  "01-06":"Melchior","01-07":"Raymond","01-08":"Lucien","01-09":"Alix","01-10":"Guillaume",
+  "01-11":"Paulin","01-12":"Tatiana","01-13":"Yvette","01-14":"Nina","01-15":"Rémi",
+  "01-16":"Marcel","01-17":"Roseline","01-18":"Prisca","01-19":"Marius","01-20":"Sébastien",
+  "01-21":"Agnès","01-22":"Vincent","01-23":"Barnard","01-24":"François de Sales","01-25":"Conv. de Paul",
+  "01-26":"Timothée","01-27":"Angèle","01-28":"Thomas d'Aquin","01-29":"Gildas","01-30":"Martine",
+  "01-31":"Marcelle","02-01":"Ella","02-02":"Présentation","02-03":"Blaise","02-04":"Véronique",
+  "02-05":"Agathe","02-06":"Gaston","02-07":"Eugénie","02-08":"Jacqueline","02-09":"Apolline",
+  "02-10":"Arnaud","02-11":"N.-D. Lourdes","02-12":"Félix","02-13":"Béatrice","02-14":"Valentin",
+  "02-15":"Claude","02-16":"Julienne","02-17":"Alexis","02-18":"Bernadette","02-19":"Gabin",
+  "02-20":"Aimée","02-21":"Damien","02-22":"Isabelle","02-23":"Lazare","02-24":"Modeste",
+  "02-25":"Roméo","02-26":"Nestor","02-27":"Honorine","02-28":"Romain","02-29":"Auguste",
+  "03-01":"Aubin","03-02":"Charles le Bon","03-03":"Guénolé","03-04":"Casimir","03-05":"Olive",
+  "03-06":"Colette","03-07":"Félicité","03-08":"Jean de Dieu","03-09":"Françoise","03-10":"Vivien",
+  "03-11":"Rosine","03-12":"Justine","03-13":"Rodrigue","03-14":"Mathilde","03-15":"Louise",
+  "03-16":"Bénédicte","03-17":"Patrick","03-18":"Cyrille","03-19":"Joseph","03-20":"Herbert",
+  "03-21":"Clémence","03-22":"Léa","03-23":"Victorien","03-24":"Cath. de Suède","03-25":"Annonciation",
+  "03-26":"Larissa","03-27":"Habib","03-28":"Gontran","03-29":"Gwladys","03-30":"Amédée",
+  "03-31":"Benjamin","04-01":"Hugues","04-02":"Sandrine","04-03":"Richard","04-04":"Isidore",
+  "04-05":"Irène","04-06":"Marcellin","04-07":"J-B de la Salle","04-08":"Julie","04-09":"Gautier",
+  "04-10":"Fulbert","04-11":"Stanislas","04-12":"Jules","04-13":"Ida","04-14":"Maxime",
+  "04-15":"Paterne","04-16":"Benoît-Joseph","04-17":"Anicet","04-18":"Parfait","04-19":"Emma",
+  "04-20":"Odette","04-21":"Anselme","04-22":"Alexandre","04-23":"Georges","04-24":"Fidèle",
+  "04-25":"Marc","04-26":"Alida","04-27":"Zita","04-28":"Valérie","04-29":"Catherine de Sienne",
+  "04-30":"Robert","05-01":"Fête du Travail","05-02":"Boris","05-03":"Phil. et Jacques","05-04":"Sylvain",
+  "05-05":"Judith","05-06":"Prudence","05-07":"Gisèle","05-08":"Victoire 1945","05-09":"Pacôme",
+  "05-10":"Solange","05-11":"Estelle","05-12":"Achille","05-13":"Rolande","05-14":"Matthias",
+  "05-15":"Denise","05-16":"Honoré","05-17":"Pascal","05-18":"Éric","05-19":"Yves",
+  "05-20":"Bernardin","05-21":"Constantin","05-22":"Émile","05-23":"Didier","05-24":"Donatien",
+  "05-25":"Sophie","05-26":"Bérenger","05-27":"Augustin de Cantorbéry","05-28":"Germain","05-29":"Aymar",
+  "05-30":"Ferdinand","05-31":"Visitation","06-01":"Justin","06-02":"Blandine","06-03":"Kévin",
+  "06-04":"Clotilde","06-05":"Igor","06-06":"Norbert","06-07":"Gilbert","06-08":"Médard",
+  "06-09":"Diane","06-10":"Landry","06-11":"Barnabé","06-12":"Guy","06-13":"Antoine de Padoue",
+  "06-14":"Élisée","06-15":"Germaine","06-16":"J-F Régis","06-17":"Hervé","06-18":"Léonce",
+  "06-19":"Romuald","06-20":"Silvère","06-21":"Rodolphe","06-22":"Alban","06-23":"Audrey",
+  "06-24":"Jean-Baptiste","06-25":"Prosper","06-26":"Anthelme","06-27":"Fernand","06-28":"Irénée",
+  "06-29":"Pierre et Paul","06-30":"Martial","07-01":"Thierry","07-02":"Martinien","07-03":"Thomas",
+  "07-04":"Florent","07-05":"Antoine","07-06":"Mariette","07-07":"Raoul","07-08":"Thibaut",
+  "07-09":"Amandine","07-10":"Ulrich","07-11":"Benoît","07-12":"Olivier","07-13":"Henri et Joël",
+  "07-14":"Fête Nationale","07-15":"Donald","07-16":"N.-D. du Carmel","07-17":"Charlotte",
+  "07-18":"Frédéric","07-19":"Arsène","07-20":"Marina","07-21":"Victor","07-22":"Marie-Madeleine",
+  "07-23":"Brigitte","07-24":"Christine","07-25":"Jacques","07-26":"Anne et Joachim","07-27":"Nathalie",
+  "07-28":"Samson","07-29":"Marthe","07-30":"Juliette","07-31":"Ignace de Loyola",
+  "08-01":"Alphonse","08-02":"Julien Eymard","08-03":"Lydie","08-04":"J-M Vianney","08-05":"Abel",
+  "08-06":"Transfiguration","08-07":"Gaétan","08-08":"Dominique","08-09":"Amour","08-10":"Laurent",
+  "08-11":"Claire","08-12":"Clarisse","08-13":"Hippolyte","08-14":"Eusèbe","08-15":"Assomption",
+  "08-16":"Armel","08-17":"Hyacinthe","08-18":"Hélène","08-19":"Jean-Eudes","08-20":"Bernard",
+  "08-21":"Christophe","08-22":"Fabrice","08-23":"Rose de Lima","08-24":"Barthélemy","08-25":"Louis",
+  "08-26":"Natacha","08-27":"Monique","08-28":"Augustin","08-29":"Sabine","08-30":"Fiacre",
+  "08-31":"Aristide","09-01":"Gilles","09-02":"Ingrid","09-03":"Grégoire le Grand","09-04":"Rosalie",
+  "09-05":"Raïssa","09-06":"Bertrand","09-07":"Reine","09-08":"Nativité de Marie","09-09":"Alain",
+  "09-10":"Inès","09-11":"Adelphe","09-12":"Apollinaire","09-13":"Aimé","09-14":"La Ste Croix",
+  "09-15":"Roland","09-16":"Edith","09-17":"Renaud","09-18":"Nadège","09-19":"Émilie",
+  "09-20":"Davy","09-21":"Matthieu","09-22":"Maurice","09-23":"Constance","09-24":"Thècle",
+  "09-25":"Hermann","09-26":"Côme et Damien","09-27":"Vinc. de Paul","09-28":"Venceslas",
+  "09-29":"Michel","09-30":"Jérôme","10-01":"Thérèse de l'Enfant Jésus","10-02":"Léger",
+  "10-03":"Gérard","10-04":"François d'Assise","10-05":"Fleur","10-06":"Bruno","10-07":"Serge",
+  "10-08":"Pélagie","10-09":"Denis","10-10":"Ghislain","10-11":"Firmin","10-12":"Wilfrid",
+  "10-13":"Géraud","10-14":"Juste","10-15":"Thérèse d'Avila","10-16":"Edwige","10-17":"Baudouin",
+  "10-18":"Luc","10-19":"René","10-20":"Adeline","10-21":"Celine","10-22":"Élodie",
+  "10-23":"Jean de Capistran","10-24":"Florentin","10-25":"Crépin","10-26":"Dimitri",
+  "10-27":"Émeline","10-28":"Simon et Jude","10-29":"Narcisse","10-30":"Bienheureux Martyrs",
+  "10-31":"Quentin","11-01":"Toussaint","11-02":"Défunts","11-03":"Hubert","11-04":"Charles Borromée",
+  "11-05":"Sylvie","11-06":"Bertille","11-07":"Carine","11-08":"Geoffrey","11-09":"Théodore",
+  "11-10":"Léon","11-11":"Armistice","11-12":"Christian","11-13":"Brice","11-14":"Sidoine",
+  "11-15":"Albert","11-16":"Marguerite","11-17":"Élisabeth","11-18":"Aude","11-19":"Tanguy",
+  "11-20":"Edmond","11-21":"Prés. de Marie","11-22":"Cécile","11-23":"Clément","11-24":"Flora",
+  "11-25":"Catherine","11-26":"Delphine","11-27":"Sévrin","11-28":"Jacques de la Marche","11-29":"Saturnin",
+  "11-30":"André","12-01":"Florence","12-02":"Viviane","12-03":"François-Xavier","12-04":"Barbara",
+  "12-05":"Gérald","12-06":"Nicolas","12-07":"Ambroise","12-08":"Immaculée Conception","12-09":"Pierre Fourier",
+  "12-10":"Romaric","12-11":"Daniel","12-12":"Jeanne de Chantal","12-13":"Lucie","12-14":"Odile",
+  "12-15":"Ninon","12-16":"Alice","12-17":"Gaël","12-18":"Gatien","12-19":"Urbain",
+  "12-20":"Abraham","12-21":"Pierre Canisius","12-22":"Françoise-Xavière","12-23":"Armand","12-24":"Adèle",
+  "12-25":"Noël","12-26":"Étienne","12-27":"Jean","12-28":"Innocents","12-29":"David",
+  "12-30":"Roger","12-31":"Sylvestre"
+};
+
+// ── Weather icons (open-meteo WMO codes) ──
+const WMO = {
+  0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️',
+  45:'🌫️', 48:'🌫️',
+  51:'🌦️', 53:'🌦️', 55:'🌧️',
+  61:'🌧️', 63:'🌧️', 65:'🌧️',
+  71:'🌨️', 73:'🌨️', 75:'❄️',
+  80:'🌦️', 81:'🌧️', 82:'⛈️',
+  95:'⛈️', 96:'⛈️', 99:'⛈️'
+};
+
+// ── Render ──
+let timer = null;
+let currentIdx = 0;
+let slides = [];
+let duration = 8;
+
+function renderStore(data) {
+  document.body.dataset.theme = data.theme || 'dark';
+  slides   = (data.slides || []).filter(s => s && s.type);
+  duration = parseInt(data.duration) || 8;
+
+  if (!slides.length) { showError('Aucune slide configurée.'); return; }
+
+  buildSlides();
+  document.getElementById('loader').style.display = 'none';
+  goTo(0);
+}
+
+async function buildSlides() {
+  const container = document.getElementById('slides-container');
+  container.innerHTML = '';
+
+  for (let i = 0; i < slides.length; i++) {
+    const s   = slides[i];
+    const div = document.createElement('div');
+    div.className = 'slide';
+    div.id = `slide-${i}`;
+    div.innerHTML = await buildSlideHTML(s);
+    container.appendChild(div);
+  }
+}
+
+async function buildSlideHTML(s) {
+  switch (s.type) {
+
+    case 'clock':
+      return `<div class="clock-time" id="clock-time">00:00</div>
+              <div class="clock-date" id="clock-date"></div>`;
+
+    case 'ephemeris': {
+      const now  = new Date();
+      const key  = String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+      const name = SAINTS[key] || '—';
+      const dateStr = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+      return `<div class="ephem-label">Aujourd'hui, fête de</div>
+              <div class="ephem-name">${name}</div>
+              <div style="font-size:clamp(1rem,2.5vw,1.8rem);color:var(--muted);margin-top:20px">${dateStr}</div>`;
+    }
+
+    case 'image':
+      return `<img class="slide-image" src="${s.image || ''}" alt="" onerror="this.style.display='none'" />
+              <div class="image-overlay"></div>
+              ${s.title ? `<div class="image-caption">${s.title}</div>` : ''}`;
+
+    case 'weather': {
+      const city = s.city || 'Paris';
+      const data = await fetchWeather(city);
+      if (!data) return `<div class="slide-title">${city}</div><div class="slide-body" style="color:var(--muted)">Météo indisponible</div>`;
+      return `<div class="weather-city">${city}</div>
+              <div style="font-size:clamp(3rem,10vw,8rem)">${WMO[data.code] || '🌡️'}</div>
+              <div class="weather-temp">${Math.round(data.temp)}°</div>
+              <div class="weather-desc">${data.desc}</div>`;
+    }
+
+    default: // message, custom
+      return `${s.title ? `<div class="slide-title">${s.title}</div>` : ''}
+              ${s.body  ? `<div class="slide-body">${s.body}</div>` : ''}`;
+  }
+}
+
+async function fetchWeather(city) {
+  try {
+    const geoR = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=fr&format=json`);
+    const geo  = await geoR.json();
+    if (!geo.results?.length) return null;
+    const { latitude, longitude } = geo.results[0];
+    const wR = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=apparent_temperature&timezone=auto&forecast_days=1`);
+    const w  = await wR.json();
+    const cw = w.current_weather;
+    return { temp: cw.temperature, code: cw.weathercode, desc: wmoDesc(cw.weathercode) };
+  } catch { return null; }
+}
+
+function wmoDesc(code) {
+  const d = {0:'Ciel dégagé',1:'Peu nuageux',2:'Partiellement nuageux',3:'Couvert',
+    45:'Brouillard',48:'Brouillard givrant',51:'Bruine légère',53:'Bruine',55:'Bruine dense',
+    61:'Pluie légère',63:'Pluie',65:'Pluie forte',71:'Neige légère',73:'Neige',75:'Neige forte',
+    80:'Averses légères',81:'Averses',82:'Averses violentes',95:'Orage',96:'Orage avec grêle',99:'Orage fort'};
+  return d[code] || '';
+}
+
+// ── Slideshow ──
+function goTo(idx) {
+  const all = document.querySelectorAll('.slide');
+  all.forEach(el => el.classList.remove('active'));
+  const target = document.getElementById(`slide-${idx}`);
+  if (!target) return;
+  target.classList.add('active');
+  currentIdx = idx;
+
+  // Start clock if needed
+  if (slides[idx]?.type === 'clock') startClock();
+  else stopClock();
+
+  // Progress bar
+  const bar = document.getElementById('progress-bar');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(() => {
+    bar.style.transition = `width ${duration}s linear`;
+    bar.style.width = '100%';
+  });
+
+  if (timer) clearTimeout(timer);
+  timer = setTimeout(() => goTo((currentIdx + 1) % slides.length), duration * 1000);
+}
+
+// ── Clock ──
+let clockInterval = null;
+function startClock() {
+  updateClock();
+  clockInterval = setInterval(updateClock, 1000);
+}
+function stopClock() {
+  if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+}
+function updateClock() {
+  const now  = new Date();
+  const h    = String(now.getHours()).padStart(2,'0');
+  const m    = String(now.getMinutes()).padStart(2,'0');
+  const s    = String(now.getSeconds()).padStart(2,'0');
+  const el   = document.getElementById('clock-time');
+  const del  = document.getElementById('clock-date');
+  if (el) el.textContent = `${h}:${m}:${s}`;
+  if (del) del.textContent = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+// ── Fullscreen on click ──
+document.addEventListener('click', () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+});
+
+// ── Error ──
+function showError(msg) {
+  document.getElementById('loader').style.display = 'none';
+  const el = document.getElementById('error-msg');
+  el.style.display = 'flex';
+  if (msg) el.querySelector('p').textContent = msg;
+}
+</script>
+</body>
+</html>
