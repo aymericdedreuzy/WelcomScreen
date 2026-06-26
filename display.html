@@ -325,14 +325,14 @@ let currentIdx = 0;
 let slides = [];
 let duration = 8;
 
-function renderStore(data) {
+async function renderStore(data) {
   document.body.dataset.theme = data.theme || 'dark';
   slides   = (data.slides || []).filter(s => s && s.type);
   duration = parseInt(data.duration) || 8;
 
   if (!slides.length) { showError('Aucune slide configurée.'); return; }
 
-  buildSlides();
+  await buildSlides();
   document.getElementById('loader').style.display = 'none';
   goTo(0);
 }
