@@ -1,745 +1,550 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WelcomScreen — Administration</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg:        #0d1117;
-      --surface:   #161b22;
-      --surface2:  #1f2937;
-      --border:    #2d3748;
-      --accent:    #6366f1;
-      --accent2:   #818cf8;
-      --success:   #10b981;
-      --danger:    #ef4444;
-      --warning:   #f59e0b;
-      --text:      #f1f5f9;
-      --muted:     #94a3b8;
-      --radius:    12px;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WelcomScreen — Administration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg:        #0d1117;
+            --surface:   #161b22;
+            --surface2:  #1f2937;
+            --border:    #2d3748;
+            --accent:    #6366f1;
+            --accent2:   #818cf8;
+            --success:   #10b981;
+            --danger:    #ef4444;
+            --warning:   #f59e0b;
+            --text:      #f1f5f9;
+            --muted:     #94a3b8;
+            --radius:    12px;
+        }
 
-    /* ── AUTH ── */
-    #auth-screen {
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh;
-      background: radial-gradient(ellipse at 50% 0%, #1e1b4b 0%, var(--bg) 70%);
-    }
-    .auth-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 48px 40px;
-      width: 100%; max-width: 420px;
-      box-shadow: 0 25px 60px rgba(0,0,0,.5);
-    }
-    .auth-logo {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 32px;
-    }
-    .auth-logo .logo-icon {
-      width: 44px; height: 44px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-    }
-    .auth-logo h1 { font-size: 22px; font-weight: 700; }
-    .auth-logo span { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
-    .auth-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
-    .auth-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
-    .field { margin-bottom: 16px; }
-    .field label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
-    .field input {
-      width: 100%; padding: 11px 14px;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); font-size: 14px;
-      font-family: inherit; transition: border-color .2s;
-    }
-    .field input:focus { outline: none; border-color: var(--accent); }
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 500;
-      font-family: inherit; cursor: pointer; border: none; transition: all .2s;
-    }
-    .btn-primary { background: var(--accent); color: #fff; width: 100%; }
-    .btn-primary:hover { background: var(--accent2); }
-    .btn-secondary {
-      background: var(--surface2); color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .btn-secondary:hover { border-color: var(--accent); }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-danger:hover { opacity: .85; }
-    .btn-sm { padding: 7px 14px; font-size: 13px; }
-    .auth-toggle { text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted); }
-    .auth-toggle a { color: var(--accent2); cursor: pointer; text-decoration: none; }
-    .msg { font-size: 13px; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; display: none; }
-    .msg.error { background: rgba(239,68,68,.15); border: 1px solid var(--danger); color: #fca5a5; display: block; }
-    .msg.success { background: rgba(16,185,129,.15); border: 1px solid var(--success); color: #6ee7b7; display: block; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
 
-    /* ── APP ── */
-    #app-screen { display: none; }
-    .topbar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      height: 60px;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100;
-    }
-    .topbar-left { display: flex; align-items: center; gap: 12px; }
-    .topbar-logo {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center; font-size: 16px;
-    }
-    .topbar h2 { font-size: 16px; font-weight: 600; }
-    .topbar-right { display: flex; align-items: center; gap: 10px; }
-    .user-badge {
-      font-size: 13px; color: var(--muted);
-      background: var(--surface2); border: 1px solid var(--border);
-      padding: 5px 12px; border-radius: 20px;
-    }
+        /* ── AUTH ── */
+        #auth-screen {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 50% 0%, #1e1b4b 0%, var(--bg) 70%);
+        }
+        .auth-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 48px 40px;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 25px 60px rgba(0,0,0,.5);
+        }
+        .auth-logo {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 32px;
+        }
+        .auth-logo .logo-icon {
+            width: 44px; height: 44px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .auth-logo h1 { font-size: 22px; font-weight: 700; }
+        .auth-logo span { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
+        .auth-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+        .auth-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
 
-    .container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+        .field { margin-bottom: 16px; }
+        .field label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
+        .field input, .field select, .field textarea {
+            width: 100%; padding: 11px 14px;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text); font-size: 14px;
+            font-family: inherit; transition: border-color .2s;
+        }
+        .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
+        .field textarea { resize: vertical; min-height: 80px; }
 
-    /* ── STORE SELECTOR ── */
-    #store-selector { margin-bottom: 32px; }
-    .section-label {
-      font-size: 11px; font-weight: 600; letter-spacing: .08em;
-      color: var(--muted); text-transform: uppercase; margin-bottom: 14px;
-    }
-    .store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 12px; margin-bottom: 16px; }
-    .store-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 16px 18px; cursor: pointer;
-      transition: all .2s;
-    }
-    .store-card:hover, .store-card.active {
-      border-color: var(--accent); background: rgba(99,102,241,.08);
-    }
-    .store-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-    .store-card span { font-size: 12px; color: var(--muted); }
-    .store-new {
-      border-style: dashed; color: var(--muted);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      font-size: 14px;
-    }
-    .store-new:hover { color: var(--accent2); }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 500;
+            font-family: inherit; cursor: pointer; border: none; transition: all .2s;
+        }
+        .btn-primary { background: var(--accent); color: #fff; width: 100%; }
+        .btn-primary:hover { background: var(--accent2); }
+        .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--accent); }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { opacity: .85; }
+        .btn-sm { padding: 7px 14px; font-size: 13px; }
 
-    /* ── EDITOR ── */
-    #editor { display: none; }
-    .editor-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 24px; flex-wrap: gap;
-    }
-    .editor-header h2 { font-size: 20px; font-weight: 700; }
-    .editor-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .auth-toggle { text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted); }
+        .auth-toggle a { color: var(--accent2); cursor: pointer; text-decoration: none; }
+        .msg { font-size: 13px; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; display: none; }
+        .msg.error { background: rgba(239,68,68,.15); border: 1px solid var(--danger); color: #fca5a5; display: block; }
+        .msg.success { background: rgba(16,185,129,.15); border: 1px solid var(--success); color: #6ee7b7; display: block; }
 
-    .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
-    .tab {
-      padding: 10px 18px; font-size: 14px; font-weight: 500; cursor: pointer;
-      color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px;
-      transition: all .2s;
-    }
-    .tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+        /* ── APP ── */
+        #app-screen { display: none; }
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px; height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .topbar-logo {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+        }
+        .topbar h2 { font-size: 16px; font-weight: 600; }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .user-badge {
+            font-size: 13px; color: var(--muted);
+            background: var(--surface2); border: 1px solid var(--border);
+            padding: 5px 12px; border-radius: 20px;
+        }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+        .container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
 
-    /* Slides tab */
-    .slides-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    .slide-item {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 16px 18px;
-      display: flex; align-items: center; gap: 14px;
-    }
-    .slide-num {
-      width: 28px; height: 28px; border-radius: 6px;
-      background: var(--surface2); color: var(--muted);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 600; flex-shrink: 0;
-    }
-    .slide-info { flex: 1; }
-    .slide-info strong { font-size: 14px; display: block; }
-    .slide-info span { font-size: 12px; color: var(--muted); }
-    .slide-actions { display: flex; gap: 6px; }
+        /* ── STORE SELECTOR ── */
+        #store-selector { margin-bottom: 32px; }
+        .section-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px; }
+        .store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 12px; margin-bottom: 16px; }
+        .store-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 18px; cursor: pointer;
+            transition: all .2s;
+        }
+        .store-card:hover, .store-card.active { border-color: var(--accent); background: rgba(99,102,241,.08); }
+        .store-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .store-card span { font-size: 12px; color: var(--muted); }
+        .store-new { border-style: dashed; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
+        .store-new:hover { color: var(--accent2); }
 
-    /* Slide editor modal */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.7);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 200; backdrop-filter: blur(4px);
-    }
-    .modal {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 28px; width: 100%; max-width: 520px;
-      max-height: 90vh; overflow-y: auto;
-    }
-    .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
-    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        /* ── EDITOR ── */
+        #editor { display: none; }
+        .editor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .editor-header h2 { font-size: 20px; font-weight: 700; }
+        .editor-actions { display: flex; gap: 10px; }
+        .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+        .tab {
+            padding: 10px 18px; font-size: 14px; font-weight: 500; cursor: pointer;
+            color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px;
+            transition: all .2s;
+        }
+        .tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-    .field select {
-      width: 100%; padding: 11px 14px;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); font-size: 14px;
-      font-family: inherit;
-    }
-    .field textarea {
-      width: 100%; padding: 11px 14px;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); font-size: 14px;
-      font-family: inherit; resize: vertical; min-height: 80px;
-    }
-    .field textarea:focus, .field select:focus { outline: none; border-color: var(--accent); }
+        .slides-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .slide-item {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 18px;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .slide-num { width: 28px; height: 28px; border-radius: 6px; background: var(--surface2); color: var(--muted); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+        .slide-info { flex: 1; }
+        .slide-info strong { font-size: 14px; display: block; }
+        .slide-info span { font-size: 12px; color: var(--muted); }
+        .slide-actions { display: flex; gap: 6px; }
 
-    /* Settings tab */
-    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 600px) { .settings-grid { grid-template-columns: 1fr; } }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 200; backdrop-filter: blur(4px); }
+        .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+        .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
 
-    .theme-picker { display: flex; gap: 10px; margin-top: 8px; }
-    .theme-swatch {
-      width: 44px; height: 44px; border-radius: 8px; cursor: pointer;
-      border: 2px solid transparent; transition: all .2s;
-    }
-    .theme-swatch.selected { border-color: var(--accent2); transform: scale(1.1); }
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 600px) { .settings-grid { grid-template-columns: 1fr; } }
 
-    /* Display link */
-    .link-box {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 8px; padding: 12px 16px;
-      display: flex; align-items: center; gap: 10px; margin-top: 8px;
-    }
-    .link-box code { flex: 1; font-size: 13px; color: var(--accent2); word-break: break-all; }
-    .link-box button {
-      background: none; border: none; cursor: pointer;
-      color: var(--muted); font-size: 18px;
-    }
-    .link-box button:hover { color: var(--text); }
+        .theme-picker { display: flex; gap: 10px; margin-top: 8px; }
+        .theme-swatch { width: 44px; height: 44px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all .2s; }
+        .theme-swatch.selected { border-color: var(--accent2); transform: scale(1.1); }
 
-    /* Preview pill */
-    .preview-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(16,185,129,.15); border: 1px solid var(--success);
-      color: #6ee7b7; font-size: 12px; padding: 4px 10px; border-radius: 20px;
-    }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.3 } }
+        .link-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+        .link-box code { flex: 1; font-size: 13px; color: var(--accent2); word-break: break-all; }
+        .link-box button { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 18px; }
 
-    .danger-zone {
-      margin-top: 40px; padding: 20px; border-radius: var(--radius);
-      border: 1px solid rgba(239,68,68,.3); background: rgba(239,68,68,.05);
-    }
-    .danger-zone h4 { font-size: 14px; font-weight: 600; color: var(--danger); margin-bottom: 8px; }
-    .danger-zone p { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+        .preview-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(16,185,129,.15); border: 1px solid var(--success); color: #6ee7b7; font-size: 12px; padding: 4px 10px; border-radius: 20px; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.3 } }
 
-    /* Toast */
-    .toast {
-      position: fixed; bottom: 24px; right: 24px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 10px; padding: 12px 18px; font-size: 14px;
-      z-index: 300; transform: translateY(80px); opacity: 0;
-      transition: all .3s; pointer-events: none;
-    }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast.ok { border-color: var(--success); color: #6ee7b7; }
-    .toast.err { border-color: var(--danger); color: #fca5a5; }
+        .danger-zone { margin-top: 40px; padding: 20px; border-radius: var(--radius); border: 1px solid rgba(239,68,68,.3); background: rgba(239,68,68,.05); }
+        .danger-zone h4 { font-size: 14px; font-weight: 600; color: var(--danger); margin-bottom: 8px; }
+        .danger-zone p { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
 
-    .hidden { display: none !important; }
-    .spin { animation: spin .8s linear infinite; display: inline-block; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  </style>
+        .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; font-size: 14px; z-index: 300; transform: translateY(80px); opacity: 0; transition: all .3s; pointer-events: none; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.ok { border-color: var(--success); color: #6ee7b7; }
+        .toast.err { border-color: var(--danger); color: #fca5a5; }
+
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
-<!-- ══════════ AUTH ══════════ -->
+<!-- ── AUTH ── -->
 <div id="auth-screen">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <div class="logo-icon">📺</div>
-      <div>
-        <h1>WelcomScreen</h1>
-        <span>Affichage dynamique pour commerces</span>
-      </div>
-    </div>
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="logo-icon">📺</div>
+            <div>
+                <h1>WelcomScreen</h1>
+                <span>Affichage dynamique pour commerces</span>
+            </div>
+        </div>
 
-    <!-- LOGIN -->
-    <div id="login-form">
-      <p class="auth-title">Connexion</p>
-      <p class="auth-sub">Accédez à votre espace d'administration</p>
-      <div id="login-msg" class="msg"></div>
-      <div class="field"><label>Adresse e-mail</label><input type="email" id="login-email" placeholder="vous@email.com" /></div>
-      <div class="field"><label>Mot de passe</label><input type="password" id="login-pwd" placeholder="••••••••" /></div>
-      <button class="btn btn-primary" onclick="doLogin()">Se connecter</button>
-      <p class="auth-toggle">Pas encore de compte ? <a onclick="toggleAuth('register')">Créer un compte</a></p>
-    </div>
+        <div id="login-form">
+            <p class="auth-title">Connexion</p>
+            <p class="auth-sub">Accédez à votre espace d'administration</p>
+            <div id="login-msg" class="msg"></div>
+            <div class="field"><label>Adresse e-mail</label><input type="email" id="login-email" placeholder="vous@email.com" /></div>
+            <div class="field"><label>Mot de passe</label><input type="password" id="login-pwd" placeholder="••••••••" /></div>
+            <button class="btn btn-primary" onclick="doLogin()">Se connecter</button>
+            <p class="auth-toggle">Pas encore de compte ? <a onclick="toggleAuth('register')">Créer un compte</a></p>
+        </div>
 
-    <!-- REGISTER -->
-    <div id="register-form" class="hidden">
-      <p class="auth-title">Créer un compte</p>
-      <p class="auth-sub">Gratuit — aucune carte bancaire requise</p>
-      <div id="register-msg" class="msg"></div>
-      <div class="field"><label>Adresse e-mail</label><input type="email" id="reg-email" placeholder="vous@email.com" /></div>
-      <div class="field"><label>Mot de passe</label><input type="password" id="reg-pwd" placeholder="8 caractères minimum" /></div>
-      <div class="field"><label>Confirmer le mot de passe</label><input type="password" id="reg-pwd2" placeholder="••••••••" /></div>
-      <button class="btn btn-primary" onclick="doRegister()">Créer mon compte</button>
-      <p class="auth-toggle">Déjà un compte ? <a onclick="toggleAuth('login')">Se connecter</a></p>
+        <div id="register-form" class="hidden">
+            <p class="auth-title">Créer un compte</p>
+            <p class="auth-sub">Gratuit — aucune carte bancaire requise</p>
+            <div id="register-msg" class="msg"></div>
+            <div class="field"><label>Adresse e-mail</label><input type="email" id="reg-email" placeholder="vous@email.com" /></div>
+            <div class="field"><label>Mot de passe</label><input type="password" id="reg-pwd" placeholder="8 caractères minimum" /></div>
+            <div class="field"><label>Confirmer le mot de passe</label><input type="password" id="reg-pwd2" placeholder="••••••••" /></div>
+            <button class="btn btn-primary" onclick="doRegister()">Créer mon compte</button>
+            <p class="auth-toggle">Déjà un compte ? <a onclick="toggleAuth('login')">Se connecter</a></p>
+        </div>
     </div>
-  </div>
 </div>
 
-<!-- ══════════ APP ══════════ -->
+<!-- ── APP ── -->
 <div id="app-screen">
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="topbar-logo">📺</div>
-      <h2>WelcomScreen</h2>
-    </div>
-    <div class="topbar-right">
-      <span class="user-badge" id="user-email-badge"></span>
-      <button class="btn btn-secondary btn-sm" onclick="doLogout()">Déconnexion</button>
-    </div>
-  </div>
-
-  <div class="container">
-
-    <!-- Store selector -->
-    <div id="store-selector">
-      <p class="section-label">Mes établissements</p>
-      <div class="store-grid" id="store-grid">
-        <div class="store-card store-new" onclick="openNewStore()">
-          <span style="font-size:20px">＋</span> Nouvel établissement
+    <div class="topbar">
+        <div class="topbar-left" onclick="window.location.href='index.html'">
+            <div class="topbar-logo">📺</div>
+            <h2>WelcomScreen</h2>
         </div>
-      </div>
+        <div class="topbar-right">
+            <span class="user-badge" id="user-email-badge"></span>
+            <button class="btn btn-secondary btn-sm" onclick="doLogout()">Déconnexion</button>
+        </div>
     </div>
 
-    <!-- Editor -->
-    <div id="editor">
-      <div class="editor-header">
-        <div>
-          <button class="btn btn-secondary btn-sm" onclick="backToStores()" style="margin-bottom:10px">← Mes établissements</button>
-          <h2 id="editor-title">Mon établissement</h2>
+    <div class="container">
+        <div id="store-selector">
+            <p class="section-label">Mes établissements</p>
+            <div class="store-grid" id="store-grid">
+                <div class="store-card store-new" onclick="openNewStore()">
+                    <span style="font-size:20px">＋</span> Nouvel établissement
+                </div>
+            </div>
         </div>
-        <div class="editor-actions">
-          <span class="preview-pill"><span class="dot"></span> Écran actif</span>
-          <button class="btn btn-primary btn-sm" onclick="saveAll()">💾 Enregistrer</button>
-        </div>
-      </div>
 
-      <div class="tabs">
-        <div class="tab active" onclick="switchTab('slides')">Slides</div>
-        <div class="tab" onclick="switchTab('settings')">Réglages</div>
-        <div class="tab" onclick="switchTab('display')">Lien d'affichage</div>
-      </div>
+        <div id="editor">
+            <div class="editor-header">
+                <div>
+                    <button class="btn btn-secondary btn-sm" onclick="backToStores()" style="margin-bottom:10px">← Mes établissements</button>
+                    <h2 id="editor-title">Mon établissement</h2>
+                </div>
+                <div class="editor-actions">
+                    <span class="preview-pill"><span class="dot"></span> Écran actif</span>
+                    <button class="btn btn-primary btn-sm" onclick="saveAll()">💾 Enregistrer</button>
+                </div>
+            </div>
 
-      <!-- SLIDES TAB -->
-      <div id="tab-slides" class="tab-content active">
-        <div class="slides-list" id="slides-list"></div>
-        <button class="btn btn-secondary" onclick="openSlideEditor(-1)" id="add-slide-btn">＋ Ajouter une slide</button>
-      </div>
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('slides')">Slides</div>
+                <div class="tab" onclick="switchTab('settings')">Réglages</div>
+                <div class="tab" onclick="switchTab('display')">Lien d'affichage</div>
+            </div>
 
-      <!-- SETTINGS TAB -->
-      <div id="tab-settings" class="tab-content">
-        <div class="settings-grid">
-          <div class="field">
-            <label>Nom de l'établissement</label>
-            <input type="text" id="s-name" placeholder="Ex : Boulangerie Martin" />
-          </div>
-          <div class="field">
-            <label>Durée par slide (secondes)</label>
-            <input type="number" id="s-duration" min="3" max="60" value="8" />
-          </div>
-        </div>
-        <div class="field" style="margin-top:16px">
-          <label>Thème de l'écran d'affichage</label>
-          <div class="theme-picker" id="theme-picker">
-            <div class="theme-swatch selected" data-theme="dark"   style="background:linear-gradient(135deg,#0d1117,#1f2937)" title="Sombre"></div>
-            <div class="theme-swatch" data-theme="light"  style="background:linear-gradient(135deg,#f8fafc,#e2e8f0)" title="Clair"></div>
-            <div class="theme-swatch" data-theme="warm"   style="background:linear-gradient(135deg,#1c0a00,#451a03)" title="Chaud"></div>
-            <div class="theme-swatch" data-theme="ocean"  style="background:linear-gradient(135deg,#062032,#0c4a6e)" title="Océan"></div>
-            <div class="theme-swatch" data-theme="forest" style="background:linear-gradient(135deg,#0a1f0f,#14391e)" title="Forêt"></div>
-            <div class="theme-swatch" data-theme="rose"   style="background:linear-gradient(135deg,#1a0a10,#3b0f20)" title="Rose"></div>
-            <div class="theme-swatch" data-theme="slate"  style="background:linear-gradient(135deg,#0f172a,#1e293b)" title="Ardoise"></div>
-            <div class="theme-swatch" data-theme="sand"   style="background:linear-gradient(135deg,#faf6f0,#f0e6d3)" title="Sable"></div>
-          </div>
-        </div>
-        <div class="danger-zone">
-          <h4>Zone de danger</h4>
-          <p>Supprimer définitivement cet établissement et toutes ses slides.</p>
-          <button class="btn btn-danger btn-sm" onclick="deleteStore()">Supprimer l'établissement</button>
-        </div>
-      </div>
+            <div id="tab-slides" class="tab-content active">
+                <div class="slides-list" id="slides-list"></div>
+                <button class="btn btn-secondary" onclick="openSlideEditor(-1)" id="add-slide-btn">＋ Ajouter une slide</button>
+            </div>
 
-      <!-- DISPLAY TAB -->
-      <div id="tab-display" class="tab-content">
-        <p class="section-label">Lien vers l'écran public</p>
-        <p style="font-size:14px;color:var(--muted);margin-bottom:14px">
-          Ouvrez ce lien sur la TV ou l'écran de votre établissement. L'affichage démarre automatiquement en plein écran.
-        </p>
-        <div class="link-box">
-          <code id="display-url"></code>
-          <button onclick="copyLink()" title="Copier">📋</button>
+            <div id="tab-settings" class="tab-content">
+                <div class="settings-grid">
+                    <div class="field"><label>Nom de l'établissement</label><input type="text" id="s-name" /></div>
+                    <div class="field"><label>Durée par slide (s)</label><input type="number" id="s-duration" min="3" max="60" /></div>
+                </div>
+                <div class="field" style="margin-top:16px">
+                    <label>Thème de l'écran</label>
+                    <div class="theme-picker" id="theme-picker">
+                        <div class="theme-swatch selected" data-theme="dark" style="background:linear-gradient(135deg,#0d1117,#1f2937)" title="Sombre"></div>
+                        <div class="theme-swatch" data-theme="light" style="background:linear-gradient(135deg,#f8fafc,#e2e8f0)" title="Clair"></div>
+                        <div class="theme-swatch" data-theme="warm" style="background:linear-gradient(135deg,#1c0a00,#451a03)" title="Chaud"></div>
+                        <div class="theme-swatch" data-theme="ocean" style="background:linear-gradient(135deg,#062032,#0c4a6e)" title="Océan"></div>
+                        <div class="theme-swatch" data-theme="forest" style="background:linear-gradient(135deg,#0a1f0f,#14391e)" title="Forêt"></div>
+                        <div class="theme-swatch" data-theme="rose" style="background:linear-gradient(135deg,#1a0a10,#3b0f20)" title="Rose"></div>
+                        <div class="theme-swatch" data-theme="slate" style="background:linear-gradient(135deg,#0f172a,#1e293b)" title="Ardoise"></div>
+                        <div class="theme-swatch" data-theme="sand" style="background:linear-gradient(135deg,#faf6f0,#f0e6d3)" title="Sable"></div>
+                    </div>
+                </div>
+                <div class="danger-zone">
+                    <h4>Zone de danger</h4>
+                    <p>Supprimer définitivement cet établissement.</p>
+                    <button class="btn btn-danger btn-sm" onclick="deleteStore()">Supprimer l'établissement</button>
+                </div>
+            </div>
+
+            <div id="tab-display" class="tab-content">
+                <p class="section-label">Lien public</p>
+                <div class="link-box"><code id="display-url"></code><button onclick="copyLink()">📋</button></div>
+                <div style="margin-top:16px;display:flex;gap:10px"><button class="btn btn-secondary" onclick="openDisplay()">🖥️ Ouvrir l'écran</button></div>
+            </div>
         </div>
-        <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-secondary" onclick="openDisplay()">🖥️ Ouvrir l'écran</button>
-          <button class="btn btn-secondary" onclick="copyLink()">📋 Copier le lien</button>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 
-<!-- ══════════ SLIDE MODAL ══════════ -->
+<!-- ── SLIDE MODAL ── -->
 <div id="slide-modal" class="modal-overlay hidden">
-  <div class="modal">
-    <h3 id="modal-title">Nouvelle slide</h3>
-    <div class="field">
-      <label>Type de contenu</label>
-      <select id="slide-type" onchange="onSlideTypeChange()">
-        <option value="message">Message de bienvenue</option>
-        <option value="image">Image (URL)</option>
-        <option value="clock">Heure en direct</option>
-        <option value="ephemeris">Éphéméride du jour</option>
-        <option value="weather">Météo (ville)</option>
-        <option value="horoscope">Horoscope du jour</option>
-        <option value="custom">Texte libre</option>
-      </select>
+    <div class="modal">
+        <h3 id="modal-title">Nouvelle slide</h3>
+        <div class="field">
+            <label>Type de contenu</label>
+            <select id="slide-type" onchange="onSlideTypeChange()">
+                <option value="message">Message de bienvenue</option>
+                <option value="image">Image (URL)</option>
+                <option value="clock">Heure en direct</option>
+                <option value="ephemeris">Éphéméride du jour</option>
+                <option value="weather">Météo (ville)</option>
+                <option value="horoscope">Horoscope du jour</option>
+                <option value="custom">Texte libre</option>
+            </select>
+        </div>
+        <div class="field" id="field-title-wrap"><label>Titre</label><input type="text" id="slide-title-input" /></div>
+        <div class="field" id="field-body-wrap"><label>Texte secondaire</label><textarea id="slide-body-input"></textarea></div>
+        <div class="field hidden" id="field-image-wrap"><label>URL de l'image</label><input type="url" id="slide-image-input" /></div>
+        <div class="field hidden" id="field-city-wrap"><label>Ville</label><input type="text" id="slide-city-input" placeholder="Toulon" /></div>
+        <div class="field hidden" id="field-sign-wrap">
+            <label>Signe astrologique</label>
+            <select id="slide-sign-input">
+                <option value="belier">♈ Bélier</option><option value="taureau">♉ Taureau</option>
+                <option value="gemeaux">♊ Gémeaux</option><option value="cancer">♋ Cancer</option>
+                <option value="lion">♌ Lion</option><option value="vierge">♍ Vierge</option>
+                <option value="balance">♎ Balance</option><option value="scorpion">♏ Scorpion</option>
+                <option value="sagittaire">♐ Sagittaire</option><option value="capricorne">♑ Capricorne</option>
+                <option value="verseau">♒ Verseau</option><option value="poissons">♓ Poissons</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeSlideModal()">Annuler</button>
+            <button class="btn btn-primary" onclick="saveSlide()">Enregistrer</button>
+        </div>
     </div>
-    <div class="field" id="field-title-wrap">
-      <label>Titre affiché</label>
-      <input type="text" id="slide-title-input" placeholder="Ex : Bienvenue chez nous !" />
-    </div>
-    <div class="field" id="field-body-wrap">
-      <label>Texte secondaire</label>
-      <textarea id="slide-body-input" placeholder="Horaires, promo, message…"></textarea>
-    </div>
-    <div class="field hidden" id="field-image-wrap">
-      <label>URL de l'image</label>
-      <input type="url" id="slide-image-input" placeholder="https://…" />
-    </div>
-    <div class="field hidden" id="field-city-wrap">
-      <label>Ville</label>
-      <input type="text" id="slide-city-input" placeholder="Toulon" />
-    </div>
-    <div class="field hidden" id="field-sign-wrap">
-      <label>Signe astrologique à afficher</label>
-      <select id="slide-sign-input">
-        <option value="belier">♈ Bélier (21 mars – 19 avril)</option>
-        <option value="taureau">♉ Taureau (20 avril – 20 mai)</option>
-        <option value="gemeaux">♊ Gémeaux (21 mai – 20 juin)</option>
-        <option value="cancer">♋ Cancer (21 juin – 22 juillet)</option>
-        <option value="lion">♌ Lion (23 juillet – 22 août)</option>
-        <option value="vierge">♍ Vierge (23 août – 22 septembre)</option>
-        <option value="balance">♎ Balance (23 septembre – 22 octobre)</option>
-        <option value="scorpion">♏ Scorpion (23 octobre – 21 novembre)</option>
-        <option value="sagittaire">♐ Sagittaire (22 novembre – 21 décembre)</option>
-        <option value="capricorne">♑ Capricorne (22 décembre – 19 janvier)</option>
-        <option value="verseau">♒ Verseau (20 janvier – 18 février)</option>
-        <option value="poissons">♓ Poissons (19 février – 20 mars)</option>
-      </select>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeSlideModal()">Annuler</button>
-      <button class="btn btn-primary" onclick="saveSlide()">Enregistrer la slide</button>
-    </div>
-  </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast" class="toast"></div>
 
-<!-- ══════════ SCRIPTS ══════════ -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getDatabase, ref, set, get, remove, onValue }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set, get, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBGjPegcDDlqqrltWhhWaWHBxPw2JxYC2Q",
-  authDomain: "welcomscreen-b6bff.firebaseapp.com",
-  databaseURL: "https://welcomscreen-b6bff-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "welcomscreen-b6bff",
-  storageBucket: "welcomscreen-b6bff.firebasestorage.app",
-  messagingSenderId: "801754342081",
-  appId: "1:801754342081:web:26f60f9b66589e690daa40"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyBGjPegcDDlqqrltWhhWaWHBxPw2JxYC2Q",
+        authDomain: "welcomscreen-b6bff.firebaseapp.com",
+        databaseURL: "https://welcomscreen-b6bff-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "welcomscreen-b6bff",
+        storageBucket: "welcomscreen-b6bff.firebasestorage.app",
+        messagingSenderId: "801754342081",
+        appId: "1:801754342081:web:26f60f9b66589e690daa40"
+    };
 
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
 
-// ── State ──
-let currentUser  = null;
-let currentStore = null; // { id, name, theme, duration, slides[] }
-let editingSlideIdx = -1;
+    let currentUser = null;
+    let currentStore = null;
+    let editingSlideIdx = -1;
 
-// ── Expose helpers to window ──
-window.doLogin = async () => {
-  const email = document.getElementById('login-email').value.trim();
-  const pwd   = document.getElementById('login-pwd').value;
-  const msg   = document.getElementById('login-msg');
-  msg.className = 'msg';
-  try {
-    await signInWithEmailAndPassword(auth, email, pwd);
-  } catch(e) {
-    msg.textContent = friendlyError(e.code);
-    msg.className = 'msg error';
-  }
-};
+    window.doLogin = async () => {
+        const email = document.getElementById('login-email').value.trim();
+        const pwd = document.getElementById('login-pwd').value;
+        try { await signInWithEmailAndPassword(auth, email, pwd); } 
+        catch(e) { document.getElementById('login-msg').textContent = friendlyError(e.code); document.getElementById('login-msg').className = 'msg error'; }
+    };
 
-window.doRegister = async () => {
-  const email = document.getElementById('reg-email').value.trim();
-  const pwd   = document.getElementById('reg-pwd').value;
-  const pwd2  = document.getElementById('reg-pwd2').value;
-  const msg   = document.getElementById('register-msg');
-  msg.className = 'msg';
-  if (pwd !== pwd2) { msg.textContent = 'Les mots de passe ne correspondent pas.'; msg.className='msg error'; return; }
-  if (pwd.length < 8) { msg.textContent = 'Le mot de passe doit faire au moins 8 caractères.'; msg.className='msg error'; return; }
-  try {
-    await createUserWithEmailAndPassword(auth, email, pwd);
-  } catch(e) {
-    msg.textContent = friendlyError(e.code);
-    msg.className = 'msg error';
-  }
-};
+    window.doRegister = async () => {
+        const email = document.getElementById('reg-email').value.trim();
+        const pwd = document.getElementById('reg-pwd').value;
+        const pwd2 = document.getElementById('reg-pwd2').value;
+        if (pwd !== pwd2) { alert('Mots de passe différents'); return; }
+        try { await createUserWithEmailAndPassword(auth, email, pwd); }
+        catch(e) { alert(friendlyError(e.code)); }
+    };
 
-window.doLogout = () => signOut(auth);
+    window.doLogout = () => signOut(auth);
+    window.toggleAuth = (mode) => {
+        document.getElementById('login-form').classList.toggle('hidden', mode !== 'login');
+        document.getElementById('register-form').classList.toggle('hidden', mode !== 'register');
+    };
 
-window.toggleAuth = (mode) => {
-  document.getElementById('login-form').classList.toggle('hidden', mode !== 'login');
-  document.getElementById('register-form').classList.toggle('hidden', mode !== 'register');
-};
-
-// ── Auth state ──
-onAuthStateChanged(auth, user => {
-  currentUser = user;
-  document.getElementById('auth-screen').style.display = user ? 'none' : 'flex';
-  document.getElementById('app-screen').style.display  = user ? 'block' : 'none';
-  if (user) {
-    document.getElementById('user-email-badge').textContent = user.email;
-    loadStores();
-    backToStores();
-  }
-});
-
-// ── Stores ──
-async function loadStores() {
-  const snap = await get(ref(db, `stores`));
-  const grid = document.getElementById('store-grid');
-  grid.innerHTML = `<div class="store-card store-new" onclick="openNewStore()"><span style="font-size:20px">＋</span> Nouvel établissement</div>`;
-  if (snap.exists()) {
-    const stores = snap.val();
-    Object.entries(stores).forEach(([id, data]) => {
-      if (data.ownerId !== currentUser.uid) return;
-      const card = document.createElement('div');
-      card.className = 'store-card';
-      card.innerHTML = `<h3>${data.name || 'Sans nom'}</h3><span>${(data.slides||[]).length} slide(s)</span>`;
-      card.onclick = () => openStore(id, data);
-      grid.insertBefore(card, grid.lastElementChild);
+    onAuthStateChanged(auth, user => {
+        currentUser = user;
+        document.getElementById('auth-screen').style.display = user ? 'none' : 'flex';
+        document.getElementById('app-screen').style.display = user ? 'block' : 'none';
+        if (user) {
+            document.getElementById('user-email-badge').textContent = user.email;
+            loadStores();
+        }
     });
-  }
-}
 
-window.openNewStore = async () => {
-  const name = prompt('Nom de l\'établissement :');
-  if (!name) return;
-  const id = 'store_' + Date.now();
-  const data = { name, ownerId: currentUser.uid, theme: 'dark', duration: 8, slides: [] };
-  await set(ref(db, `stores/${id}`), data);
-  toast('Établissement créé ✓', 'ok');
-  loadStores();
-  openStore(id, data);
-};
+    async function loadStores() {
+        const snap = await get(ref(db, `stores`));
+        const grid = document.getElementById('store-grid');
+        grid.innerHTML = '<div class="store-card store-new" onclick="openNewStore()"><span style="font-size:20px">＋</span> Nouvel établissement</div>';
+        if (snap.exists()) {
+            Object.entries(snap.val()).forEach(([id, data]) => {
+                if (data.ownerId !== currentUser.uid) return;
+                const card = document.createElement('div');
+                card.className = 'store-card';
+                card.innerHTML = `<h3>${data.name}</h3><span>${(data.slides||[]).length} slide(s)</span>`;
+                card.onclick = () => openStore(id, data);
+                grid.insertBefore(card, grid.lastElementChild);
+            });
+        }
+    }
 
-window.openStore = (id, data) => {
-  currentStore = { id, ...data, slides: data.slides || [] };
-  document.getElementById('store-selector').style.display = 'none';
-  document.getElementById('editor').style.display = 'block';
-  document.getElementById('editor-title').textContent = currentStore.name;
-  document.getElementById('s-name').value = currentStore.name;
-  document.getElementById('s-duration').value = currentStore.duration || 8;
-  setTheme(currentStore.theme || 'dark');
-  renderSlides();
-  updateDisplayUrl();
-  switchTab('slides');
-};
+    window.openNewStore = async () => {
+        const name = prompt('Nom :');
+        if (!name) return;
+        const id = 'store_' + Date.now();
+        const data = { name, ownerId: currentUser.uid, theme: 'dark', duration: 8, slides: [] };
+        await set(ref(db, `stores/${id}`), data);
+        loadStores();
+    };
 
-window.backToStores = () => {
-  document.getElementById('store-selector').style.display = 'block';
-  document.getElementById('editor').style.display = 'none';
-  currentStore = null;
-  loadStores();
-};
+    window.openStore = (id, data) => {
+        currentStore = { id, ...data, slides: data.slides || [] };
+        document.getElementById('store-selector').style.display = 'none';
+        document.getElementById('editor').style.display = 'block';
+        document.getElementById('editor-title').textContent = currentStore.name;
+        document.getElementById('s-name').value = currentStore.name;
+        document.getElementById('s-duration').value = currentStore.duration || 8;
+        setTheme(currentStore.theme || 'dark');
+        renderSlides();
+        updateDisplayUrl();
+        switchTab('slides');
+    };
 
-window.saveAll = async () => {
-  if (!currentStore) return;
-  currentStore.name     = document.getElementById('s-name').value || currentStore.name;
-  currentStore.duration = parseInt(document.getElementById('s-duration').value) || 8;
-  const { id, ...data } = currentStore;
-  await set(ref(db, `stores/${id}`), { ...data, ownerId: currentUser.uid });
-  document.getElementById('editor-title').textContent = currentStore.name;
-  toast('Enregistré ✓', 'ok');
-  loadStores();
-};
+    window.backToStores = () => {
+        document.getElementById('store-selector').style.display = 'block';
+        document.getElementById('editor').style.display = 'none';
+        loadStores();
+    };
 
-window.deleteStore = async () => {
-  if (!currentStore) return;
-  if (!confirm(`Supprimer "${currentStore.name}" définitivement ?`)) return;
-  await remove(ref(db, `stores/${currentStore.id}`));
-  toast('Établissement supprimé', 'ok');
-  backToStores();
-};
+    window.saveAll = async () => {
+        currentStore.name = document.getElementById('s-name').value;
+        currentStore.duration = parseInt(document.getElementById('s-duration').value);
+        const { id, ...data } = currentStore;
+        await set(ref(db, `stores/${id}`), { ...data, ownerId: currentUser.uid });
+        toast('Enregistré ✓');
+    };
 
-// ── Slides ──
-function renderSlides() {
-  const list = document.getElementById('slides-list');
-  list.innerHTML = '';
-  const max = 10;
-  currentStore.slides.forEach((s, i) => {
-    const item = document.createElement('div');
-    item.className = 'slide-item';
-    item.innerHTML = `
-      <div class="slide-num">${i+1}</div>
-      <div class="slide-info">
-        <strong>${s.title || typeLabel(s.type)}</strong>
-        <span>${typeLabel(s.type)}${s.body ? ' · ' + s.body.substring(0,40) : ''}</span>
-      </div>
-      <div class="slide-actions">
-        ${i > 0 ? `<button class="btn btn-secondary btn-sm" onclick="moveSlide(${i},-1)">↑</button>` : ''}
-        ${i < currentStore.slides.length-1 ? `<button class="btn btn-secondary btn-sm" onclick="moveSlide(${i},1)">↓</button>` : ''}
-        <button class="btn btn-secondary btn-sm" onclick="openSlideEditor(${i})">✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="removeSlide(${i})">✕</button>
-      </div>`;
-    list.appendChild(item);
-  });
-  document.getElementById('add-slide-btn').style.display =
-    currentStore.slides.length >= max ? 'none' : 'inline-flex';
-}
+    window.deleteStore = async () => {
+        if (confirm('Supprimer ?')) {
+            await remove(ref(db, `stores/${currentStore.id}`));
+            backToStores();
+        }
+    };
 
-window.openSlideEditor = (idx) => {
-  editingSlideIdx = idx;
-  const s = idx >= 0 ? currentStore.slides[idx] : {};
-  document.getElementById('modal-title').textContent = idx >= 0 ? 'Modifier la slide' : 'Nouvelle slide';
-  document.getElementById('slide-type').value         = s.type || 'message';
-  document.getElementById('slide-title-input').value  = s.title || '';
-  document.getElementById('slide-body-input').value   = s.body || '';
-  document.getElementById('slide-image-input').value  = s.image || '';
-  document.getElementById('slide-city-input').value   = s.city || '';
-  document.getElementById('slide-sign-input').value   = s.sign || 'belier';
-  onSlideTypeChange();
-  document.getElementById('slide-modal').classList.remove('hidden');
-};
+    function renderSlides() {
+        const list = document.getElementById('slides-list');
+        list.innerHTML = '';
+        const maxSlides = 3; // LIMITE PLAN GRATUIT
+        currentStore.slides.forEach((s, i) => {
+            const item = document.createElement('div');
+            item.className = 'slide-item';
+            item.innerHTML = `<div class="slide-num">${i+1}</div><div class="slide-info"><strong>${s.title || s.type}</strong></div>
+                <div class="slide-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="openSlideEditor(${i})">✏️</button>
+                    <button class="btn btn-danger btn-sm" onclick="removeSlide(${i})">✕</button>
+                </div>`;
+            list.appendChild(item);
+        });
+        document.getElementById('add-slide-btn').style.display = currentStore.slides.length >= maxSlides ? 'none' : 'inline-flex';
+    }
 
-window.closeSlideModal = () => document.getElementById('slide-modal').classList.add('hidden');
+    window.openSlideEditor = (idx) => {
+        editingSlideIdx = idx;
+        const s = idx >= 0 ? currentStore.slides[idx] : {};
+        document.getElementById('slide-type').value = s.type || 'message';
+        document.getElementById('slide-title-input').value = s.title || '';
+        document.getElementById('slide-body-input').value = s.body || '';
+        onSlideTypeChange();
+        document.getElementById('slide-modal').classList.remove('hidden');
+    };
 
-window.onSlideTypeChange = () => {
-  const type = document.getElementById('slide-type').value;
-  document.getElementById('field-title-wrap').classList.toggle('hidden', ['clock','ephemeris','horoscope'].includes(type));
-  document.getElementById('field-body-wrap').classList.toggle('hidden',  ['clock','ephemeris','image','weather','horoscope'].includes(type));
-  document.getElementById('field-image-wrap').classList.toggle('hidden', type !== 'image');
-  document.getElementById('field-city-wrap').classList.toggle('hidden',  type !== 'weather');
-  document.getElementById('field-sign-wrap').classList.toggle('hidden',  type !== 'horoscope');
-};
+    window.closeSlideModal = () => document.getElementById('slide-modal').classList.add('hidden');
 
-window.saveSlide = () => {
-  const type  = document.getElementById('slide-type').value;
-  const slide = {
-    type,
-    title: document.getElementById('slide-title-input').value,
-    body:  document.getElementById('slide-body-input').value,
-    image: document.getElementById('slide-image-input').value,
-    city:  document.getElementById('slide-city-input').value,
-    sign:  document.getElementById('slide-sign-input').value,
-  };
-  if (editingSlideIdx >= 0) {
-    currentStore.slides[editingSlideIdx] = slide;
-  } else {
-    currentStore.slides.push(slide);
-  }
-  renderSlides();
-  closeSlideModal();
-};
+    window.onSlideTypeChange = () => {
+        const type = document.getElementById('slide-type').value;
+        document.getElementById('field-title-wrap').classList.toggle('hidden', ['clock','ephemeris'].includes(type));
+        document.getElementById('field-body-wrap').classList.toggle('hidden', ['clock','image','weather','horoscope'].includes(type));
+        document.getElementById('field-image-wrap').classList.toggle('hidden', type !== 'image');
+        document.getElementById('field-city-wrap').classList.toggle('hidden', type !== 'weather');
+        document.getElementById('field-sign-wrap').classList.toggle('hidden', type !== 'horoscope');
+    };
 
-window.removeSlide = (idx) => {
-  if (!confirm('Supprimer cette slide ?')) return;
-  currentStore.slides.splice(idx, 1);
-  renderSlides();
-};
+    window.saveSlide = () => {
+        const slide = {
+            type: document.getElementById('slide-type').value,
+            title: document.getElementById('slide-title-input').value,
+            body: document.getElementById('slide-body-input').value,
+            image: document.getElementById('slide-image-input').value,
+            city: document.getElementById('slide-city-input').value,
+            sign: document.getElementById('slide-sign-input').value,
+        };
+        if (editingSlideIdx >= 0) currentStore.slides[editingSlideIdx] = slide;
+        else currentStore.slides.push(slide);
+        renderSlides();
+        closeSlideModal();
+    };
 
-window.moveSlide = (idx, dir) => {
-  const arr = currentStore.slides;
-  const tmp = arr[idx]; arr[idx] = arr[idx+dir]; arr[idx+dir] = tmp;
-  renderSlides();
-};
+    window.removeSlide = (idx) => { if (confirm('Supprimer ?')) { currentStore.slides.splice(idx, 1); renderSlides(); } };
 
-// ── Theme ──
-function setTheme(t) {
-  document.querySelectorAll('.theme-swatch').forEach(el => {
-    el.classList.toggle('selected', el.dataset.theme === t);
-  });
-  currentStore.theme = t;
-}
-document.getElementById('theme-picker').addEventListener('click', e => {
-  const sw = e.target.closest('.theme-swatch');
-  if (sw) setTheme(sw.dataset.theme);
-});
+    function setTheme(t) {
+        document.querySelectorAll('.theme-swatch').forEach(el => el.classList.toggle('selected', el.dataset.theme === t));
+        currentStore.theme = t;
+    }
 
-// ── Tabs ──
-window.switchTab = (name) => {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    const names = ['slides','settings','display'];
-    t.classList.toggle('active', names[i] === name);
-  });
-  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-  document.getElementById(`tab-${name}`).classList.add('active');
-};
+    document.getElementById('theme-picker').addEventListener('click', e => {
+        const sw = e.target.closest('.theme-swatch');
+        if (sw) setTheme(sw.dataset.theme);
+    });
 
-// ── Display link ──
-function updateDisplayUrl() {
-  const url = `${location.origin}${location.pathname.replace('admin.html','display.html')}?store=${currentStore.id}`;
-  document.getElementById('display-url').textContent = url;
-}
-window.copyLink = () => {
-  const url = document.getElementById('display-url').textContent;
-  navigator.clipboard.writeText(url).then(() => toast('Lien copié ✓', 'ok'));
-};
-window.openDisplay = () => {
-  const url = document.getElementById('display-url').textContent;
-  window.open(url, '_blank');
-};
+    window.switchTab = (name) => {
+        document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['slides','settings','display'][i] === name));
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        document.getElementById(`tab-${name}`).classList.add('active');
+    };
 
-// ── Helpers ──
-function typeLabel(t) {
-  return { message:'Bienvenue', image:'Image', clock:'Horloge', ephemeris:'Éphéméride', weather:'Météo', horoscope:'Horoscope', custom:'Texte libre' }[t] || t;
-}
-function friendlyError(code) {
-  const m = {
-    'auth/invalid-email': 'Adresse e-mail invalide.',
-    'auth/user-not-found': 'Aucun compte avec cet e-mail.',
-    'auth/wrong-password': 'Mot de passe incorrect.',
-    'auth/email-already-in-use': 'Cet e-mail est déjà utilisé.',
-    'auth/weak-password': 'Mot de passe trop faible.',
-    'auth/invalid-credential': 'Identifiants incorrects.',
-  };
-  return m[code] || 'Une erreur est survenue. Réessayez.';
-}
-function toast(msg, type='ok') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `toast show ${type}`;
-  setTimeout(() => el.className = 'toast', 2800);
-}
+    function updateDisplayUrl() {
+        const url = `${location.origin}${location.pathname.replace('admin.html','display.html')}?store=${currentStore.id}`;
+        document.getElementById('display-url').textContent = url;
+    }
+
+    window.copyLink = () => { navigator.clipboard.writeText(document.getElementById('display-url').textContent); toast('Copié ✓'); };
+    window.openDisplay = () => window.open(document.getElementById('display-url').textContent, '_blank');
+
+    function friendlyError(code) {
+        return { 'auth/invalid-credential': 'Identifiants incorrects.', 'auth/email-already-in-use': 'Email déjà utilisé.' }[code] || 'Erreur.';
+    }
+
+    function toast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg; el.className = 'toast show ok';
+        setTimeout(() => el.className = 'toast', 2000);
+    }
 </script>
 </body>
 </html>
