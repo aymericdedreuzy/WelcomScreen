@@ -362,10 +362,14 @@
         <div class="field" style="margin-top:16px">
           <label>Thème de l'écran d'affichage</label>
           <div class="theme-picker" id="theme-picker">
-            <div class="theme-swatch selected" data-theme="dark" style="background:linear-gradient(135deg,#0d1117,#1f2937)" title="Sombre"></div>
-            <div class="theme-swatch" data-theme="light" style="background:linear-gradient(135deg,#f8fafc,#e2e8f0)" title="Clair"></div>
-            <div class="theme-swatch" data-theme="warm" style="background:linear-gradient(135deg,#451a03,#92400e)" title="Chaud"></div>
-            <div class="theme-swatch" data-theme="ocean" style="background:linear-gradient(135deg,#0c4a6e,#0369a1)" title="Océan"></div>
+            <div class="theme-swatch selected" data-theme="dark"   style="background:linear-gradient(135deg,#0d1117,#1f2937)" title="Sombre"></div>
+            <div class="theme-swatch" data-theme="light"  style="background:linear-gradient(135deg,#f8fafc,#e2e8f0)" title="Clair"></div>
+            <div class="theme-swatch" data-theme="warm"   style="background:linear-gradient(135deg,#1c0a00,#451a03)" title="Chaud"></div>
+            <div class="theme-swatch" data-theme="ocean"  style="background:linear-gradient(135deg,#062032,#0c4a6e)" title="Océan"></div>
+            <div class="theme-swatch" data-theme="forest" style="background:linear-gradient(135deg,#0a1f0f,#14391e)" title="Forêt"></div>
+            <div class="theme-swatch" data-theme="rose"   style="background:linear-gradient(135deg,#1a0a10,#3b0f20)" title="Rose"></div>
+            <div class="theme-swatch" data-theme="slate"  style="background:linear-gradient(135deg,#0f172a,#1e293b)" title="Ardoise"></div>
+            <div class="theme-swatch" data-theme="sand"   style="background:linear-gradient(135deg,#faf6f0,#f0e6d3)" title="Sable"></div>
           </div>
         </div>
         <div class="danger-zone">
@@ -406,6 +410,7 @@
         <option value="clock">Heure en direct</option>
         <option value="ephemeris">Éphéméride du jour</option>
         <option value="weather">Météo (ville)</option>
+        <option value="horoscope">Horoscope du jour</option>
         <option value="custom">Texte libre</option>
       </select>
     </div>
@@ -424,6 +429,23 @@
     <div class="field hidden" id="field-city-wrap">
       <label>Ville</label>
       <input type="text" id="slide-city-input" placeholder="Toulon" />
+    </div>
+    <div class="field hidden" id="field-sign-wrap">
+      <label>Signe astrologique à afficher</label>
+      <select id="slide-sign-input">
+        <option value="belier">♈ Bélier (21 mars – 19 avril)</option>
+        <option value="taureau">♉ Taureau (20 avril – 20 mai)</option>
+        <option value="gemeaux">♊ Gémeaux (21 mai – 20 juin)</option>
+        <option value="cancer">♋ Cancer (21 juin – 22 juillet)</option>
+        <option value="lion">♌ Lion (23 juillet – 22 août)</option>
+        <option value="vierge">♍ Vierge (23 août – 22 septembre)</option>
+        <option value="balance">♎ Balance (23 septembre – 22 octobre)</option>
+        <option value="scorpion">♏ Scorpion (23 octobre – 21 novembre)</option>
+        <option value="sagittaire">♐ Sagittaire (22 novembre – 21 décembre)</option>
+        <option value="capricorne">♑ Capricorne (22 décembre – 19 janvier)</option>
+        <option value="verseau">♒ Verseau (20 janvier – 18 février)</option>
+        <option value="poissons">♓ Poissons (19 février – 20 mars)</option>
+      </select>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeSlideModal()">Annuler</button>
@@ -614,6 +636,7 @@ window.openSlideEditor = (idx) => {
   document.getElementById('slide-body-input').value   = s.body || '';
   document.getElementById('slide-image-input').value  = s.image || '';
   document.getElementById('slide-city-input').value   = s.city || '';
+  document.getElementById('slide-sign-input').value   = s.sign || 'belier';
   onSlideTypeChange();
   document.getElementById('slide-modal').classList.remove('hidden');
 };
@@ -622,10 +645,11 @@ window.closeSlideModal = () => document.getElementById('slide-modal').classList.
 
 window.onSlideTypeChange = () => {
   const type = document.getElementById('slide-type').value;
-  document.getElementById('field-title-wrap').classList.toggle('hidden', ['clock','ephemeris'].includes(type));
-  document.getElementById('field-body-wrap').classList.toggle('hidden',  ['clock','ephemeris','image','weather'].includes(type));
+  document.getElementById('field-title-wrap').classList.toggle('hidden', ['clock','ephemeris','horoscope'].includes(type));
+  document.getElementById('field-body-wrap').classList.toggle('hidden',  ['clock','ephemeris','image','weather','horoscope'].includes(type));
   document.getElementById('field-image-wrap').classList.toggle('hidden', type !== 'image');
   document.getElementById('field-city-wrap').classList.toggle('hidden',  type !== 'weather');
+  document.getElementById('field-sign-wrap').classList.toggle('hidden',  type !== 'horoscope');
 };
 
 window.saveSlide = () => {
@@ -636,6 +660,7 @@ window.saveSlide = () => {
     body:  document.getElementById('slide-body-input').value,
     image: document.getElementById('slide-image-input').value,
     city:  document.getElementById('slide-city-input').value,
+    sign:  document.getElementById('slide-sign-input').value,
   };
   if (editingSlideIdx >= 0) {
     currentStore.slides[editingSlideIdx] = slide;
@@ -696,7 +721,7 @@ window.openDisplay = () => {
 
 // ── Helpers ──
 function typeLabel(t) {
-  return { message:'Bienvenue', image:'Image', clock:'Horloge', ephemeris:'Éphéméride', weather:'Météo', custom:'Texte libre' }[t] || t;
+  return { message:'Bienvenue', image:'Image', clock:'Horloge', ephemeris:'Éphéméride', weather:'Météo', horoscope:'Horoscope', custom:'Texte libre' }[t] || t;
 }
 function friendlyError(code) {
   const m = {
