@@ -326,7 +326,7 @@
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px">
         <p class="section-label">Rechercher un utilisateur</p>
         <div style="display:flex;gap:8px;margin-bottom:16px">
-          <input type="text" id="sa-search-email" placeholder="email@client.com" style="flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit" />
+          <input type="text" id="sa-search-email" placeholder="email@client.com ou UID Firebase" style="flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit" />
           <button class="btn btn-secondary" onclick="saSearch()">Rechercher</button>
         </div>
         <div id="sa-results" class="sa-grid"></div>
@@ -813,24 +813,40 @@ window.saLoadOverrides = async () => {
 };
 
 window.saSearch = async () => {
-  const email   = document.getElementById('sa-search-email').value.trim();
-  if (!email) return;
+  const query   = document.getElementById('sa-search-email').value.trim();
+  if (!query) return;
   const results = document.getElementById('sa-results');
   results.innerHTML = '<p class="sa-empty">Recherche…</p>';
+
   const idxSnap = await get(ref(db, 'userIndex'));
-  let uid = null;
-  if (idxSnap.exists()) {
-    const idx = idxSnap.val();
-    uid = Object.keys(idx).find(k => idx[k] === email) || null;
+  const idx     = idxSnap.exists() ? idxSnap.val() : {};
+
+  let uid   = null;
+  let email = null;
+
+  // Détecter si c'est un UID (pas d'@ et longueur typique Firebase ~28 chars) ou un email
+  const looksLikeUid = !query.includes('@') && query.length > 15;
+
+  if (looksLikeUid) {
+    // Recherche directe par UID
+    uid   = query;
+    email = idx[uid] || null;
+  } else {
+    // Recherche par email dans l'index
+    uid   = Object.keys(idx).find(k => idx[k] === query) || null;
+    email = query;
   }
+
   if (!uid) {
     results.innerHTML = `<p class="sa-empty">Utilisateur introuvable — il doit s'être connecté au moins une fois.</p>`;
     return;
   }
+
+  // Si email pas trouvé dans l'index mais UID saisi directement, on tente quand même
   const overSnap = await get(ref(db, `overrides/${uid}`));
   const existing = overSnap.exists() ? overSnap.val() : {};
   results.innerHTML = '';
-  results.appendChild(buildOverrideCard(uid, { email, ...existing }));
+  results.appendChild(buildOverrideCard(uid, { email: email || existing.email || uid, ...existing }));
 };
 
 function buildOverrideCard(uid, d) {
