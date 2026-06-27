@@ -770,7 +770,13 @@ window.switchTab = (name) => {
 
 // ── Display link ──
 function updateDisplayUrl() {
-  const url = `${location.origin}${location.pathname.replace('admin.html','display.html')}?store=${currentStore.id}`;
+  // Construit le chemin vers display.html de façon robuste
+  // que l'on soit sur GitHub Pages (/repo/admin.html), fichier local (admin.html) ou autre
+  const base = location.href
+    .split('?')[0]            // enlève les paramètres existants
+    .replace(/#.*$/, '')      // enlève le hash
+    .replace(/\/[^/]*$/, '/'); // remonte au dossier (supprime le dernier segment)
+  const url = `${base}display.html?store=${currentStore.id}`;
   document.getElementById('display-url').textContent = url;
 }
 window.copyLink = () => {
