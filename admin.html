@@ -58,7 +58,7 @@
     .container{max-width:960px;margin:0 auto;padding:32px 24px;}
 
     /* STORE SELECTOR */
-    #store-selector{margin-bottom:32px;}
+    #screen-stores{margin-bottom:32px;}
     .section-label{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
     .store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:16px;}
     .store-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;cursor:pointer;transition:all .2s;}
@@ -207,13 +207,15 @@
     </div>
     <div class="topbar-right">
       <span class="user-badge" id="user-email-badge"></span>
+      <button class="btn btn-secondary btn-sm" id="sa-topbar-btn" style="display:none" onclick="showScreen('superadmin')">⚙️ Super Admin</button>
       <button class="btn btn-secondary btn-sm" onclick="doLogout()">Déconnexion</button>
     </div>
   </div>
 
   <div class="container">
-    <!-- Store selector -->
-    <div id="store-selector">
+
+    <!-- ══ ÉCRAN : liste stores ══ -->
+    <div id="screen-stores">
       <p class="section-label">Mes établissements</p>
       <div class="store-grid" id="store-grid">
         <div class="store-card store-new" onclick="openNewStore()">
@@ -222,11 +224,11 @@
       </div>
     </div>
 
-    <!-- Editor -->
-    <div id="editor">
+    <!-- ══ ÉCRAN : éditeur store ══ -->
+    <div id="screen-editor" style="display:none">
       <div class="editor-header">
         <div>
-          <button class="btn btn-secondary btn-sm" onclick="backToStores()" style="margin-bottom:10px">← Mes établissements</button>
+          <button class="btn btn-secondary btn-sm" onclick="showScreen('stores')" style="margin-bottom:10px">← Mes établissements</button>
           <h2 id="editor-title">Mon établissement</h2>
         </div>
         <div class="editor-actions">
@@ -264,7 +266,6 @@
           </div>
         </div>
 
-        <!-- COULEUR -->
         <div class="theme-section-label">🎨 Couleur de l'écran</div>
         <div class="color-picker" id="color-picker">
           <div class="color-swatch selected" data-color="dark"   style="background:linear-gradient(135deg,#0d1117,#1f2937)" title="Sombre"><span class="check">✓</span></div>
@@ -277,7 +278,6 @@
           <div class="color-swatch" data-color="sand"   style="background:linear-gradient(135deg,#faf6f0,#f0e6d3)" title="Sable"><span class="check" style="color:#333">✓</span></div>
         </div>
 
-        <!-- POLICE -->
         <div class="theme-section-label">🔤 Police d'affichage</div>
         <div class="font-picker" id="font-picker">
           <div class="font-pill selected" data-font="inter"      style="font-family:'Inter',sans-serif">Inter</div>
@@ -312,26 +312,45 @@
           <button class="btn btn-secondary" onclick="copyLink()">📋 Copier le lien</button>
         </div>
       </div>
+    </div>
 
-      <!-- SUPER ADMIN TAB (caché, visible seulement pour l'admin) -->
-      <div id="tab-superadmin" class="tab-content">
-        <p class="section-label">Gestion des licences & exceptions</p>
-        <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
-          Accordez des droits étendus à un utilisateur spécifique (slides supplémentaires, établissements supplémentaires).
-        </p>
-        <div class="field sa-search">
-          <label>Rechercher par e-mail utilisateur</label>
-          <div style="display:flex;gap:8px">
-            <input type="text" id="sa-search-email" placeholder="utilisateur@email.com" style="flex:1" />
-            <button class="btn btn-secondary" onclick="saSearch()">Rechercher</button>
-          </div>
+    <!-- ══ ÉCRAN : Super Admin ══ -->
+    <div id="screen-superadmin" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="showScreen('stores')">← Mes établissements</button>
+        <h2 style="font-size:20px;font-weight:700">⚙️ Super Admin</h2>
+        <span style="font-size:13px;color:var(--muted)">— Gestion globale des licences et clients</span>
+      </div>
+
+      <!-- Recherche utilisateur -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px">
+        <p class="section-label">Rechercher un utilisateur</p>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <input type="text" id="sa-search-email" placeholder="email@client.com" style="flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit" />
+          <button class="btn btn-secondary" onclick="saSearch()">Rechercher</button>
         </div>
         <div id="sa-results" class="sa-grid"></div>
-        <div class="divider"></div>
-        <p class="section-label">Toutes les exceptions actives</p>
+      </div>
+
+      <!-- Tous les stores -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <p class="section-label" style="margin:0">Tous les établissements</p>
+          <button class="btn btn-secondary btn-sm" onclick="saLoadAllStores()">🔄 Actualiser</button>
+        </div>
+        <div id="sa-all-stores" class="sa-grid"></div>
+      </div>
+
+      <!-- Exceptions actives -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <p class="section-label" style="margin:0">Exceptions de licences actives</p>
+          <button class="btn btn-secondary btn-sm" onclick="saLoadOverrides()">🔄 Actualiser</button>
+        </div>
         <div id="sa-overrides" class="sa-grid"></div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -411,7 +430,7 @@ const firebaseConfig = {
   appId: "1:801754342081:web:26f60f9b66589e690daa40"
 };
 
-const SUPER_ADMIN_EMAIL = "aymeric.servais@gmail.com"; // ← ton email admin
+const SUPER_ADMIN_EMAIL = "aymeric.dedreuzy@gmail.com";
 const FREE_MAX_SLIDES   = 3;
 const FREE_MAX_STORES   = 1;
 
@@ -466,19 +485,12 @@ onAuthStateChanged(auth, async user => {
   if (user) {
     document.getElementById('user-email-badge').textContent = user.email;
     isSuperAdmin = (user.email === SUPER_ADMIN_EMAIL);
+    document.getElementById('sa-topbar-btn').style.display = isSuperAdmin ? 'inline-flex' : 'none';
     await loadUserLimits();
-    // Afficher onglet super-admin si admin
-    const tabs = document.getElementById('editor-tabs');
-    const saTab = tabs.querySelector('[onclick="switchTab(\'superadmin\')"]');
-    if (isSuperAdmin && !saTab) {
-      const t = document.createElement('div');
-      t.className = 'tab';
-      t.setAttribute('onclick', "switchTab('superadmin')");
-      t.textContent = '⚙️ Super Admin';
-      tabs.appendChild(t);
-    }
     loadStores();
-    backToStores();
+    showScreen('stores');
+    // Enregistrer email dans l'index pour recherche super admin
+    set(ref(db, `userIndex/${user.uid}`), user.email);
   }
 });
 
@@ -550,8 +562,7 @@ window.openNewStore = async () => {
 
 window.openStore = (id, data) => {
   currentStore = { id, ...data, slides: data.slides || [] };
-  document.getElementById('store-selector').style.display = 'none';
-  document.getElementById('editor').style.display = 'block';
+  showScreen('editor');
   document.getElementById('editor-title').textContent = currentStore.name;
   document.getElementById('s-name').value = currentStore.name;
   document.getElementById('s-duration').value = currentStore.duration || 8;
@@ -562,12 +573,17 @@ window.openStore = (id, data) => {
   switchTab('slides');
 };
 
-window.backToStores = () => {
-  document.getElementById('store-selector').style.display = 'block';
-  document.getElementById('editor').style.display = 'none';
-  currentStore = null;
-  loadStores();
+// ── NAVIGATION ENTRE ÉCRANS ──
+window.showScreen = (name) => {
+  ['stores','editor','superadmin'].forEach(s => {
+    const el = document.getElementById(`screen-${s}`);
+    if (el) el.style.display = (s === name) ? 'block' : 'none';
+  });
+  if (name === 'stores') { currentStore = null; loadStores(); }
+  if (name === 'superadmin') { saLoadAllStores(); saLoadOverrides(); }
 };
+
+window.backToStores = () => showScreen('stores'); // compat
 
 window.saveAll = async () => {
   if (!currentStore) return;
@@ -580,14 +596,17 @@ window.saveAll = async () => {
   loadStores();
 };
 
-// ── DELETE STORE — fix bouton ──
+// ── DELETE STORE ──
 document.getElementById('delete-store-btn').addEventListener('click', async () => {
   if (!currentStore) return;
-  if (!confirm(`Supprimer "${currentStore.name}" définitivement ?`)) return;
+  const storeId   = currentStore.id;
+  const storeName = currentStore.name;
+  if (!confirm(`Supprimer "${storeName}" définitivement ? Cette action est irréversible.`)) return;
   try {
-    await remove(ref(db, `stores/${currentStore.id}`));
-    toast('Établissement supprimé', 'ok');
-    backToStores();
+    currentStore = null; // vider avant le remove pour éviter tout rechargement parasite
+    await remove(ref(db, `stores/${storeId}`));
+    showScreen('stores');
+    toast(`"${storeName}" supprimé`, 'ok');
   } catch(e) {
     toast('Erreur lors de la suppression', 'err');
     console.error(e);
@@ -629,13 +648,21 @@ window.openSlideEditor = (idx) => {
   editingSlideIdx = idx;
   const s = idx >= 0 ? currentStore.slides[idx] : {};
   document.getElementById('modal-title').textContent = idx >= 0 ? 'Modifier la slide' : 'Nouvelle slide';
-  document.getElementById('slide-type').value         = s.type || 'message';
-  document.getElementById('slide-title-input').value  = s.title || '';
-  document.getElementById('slide-body-input').value   = s.body || '';
-  document.getElementById('slide-image-input').value  = s.image || '';
-  document.getElementById('slide-city-input').value   = s.city || '';
-  document.getElementById('slide-sign-input').value   = s.sign || 'belier';
-  onSlideTypeChange();
+  // Charger le type d'abord
+  document.getElementById('slide-type').value = s.type || 'message';
+  // Charger les valeurs existantes SANS déclencher onSlideTypeChange (qui viderait tout)
+  document.getElementById('slide-title-input').value = s.title || '';
+  document.getElementById('slide-body-input').value  = s.body  || '';
+  document.getElementById('slide-image-input').value = s.image || '';
+  document.getElementById('slide-city-input').value  = s.city  || '';
+  document.getElementById('slide-sign-input').value  = s.sign  || 'belier';
+  // Afficher/masquer les champs selon le type (sans vider)
+  const type = s.type || 'message';
+  document.getElementById('field-title-wrap').classList.toggle('hidden', ['clock','ephemeris','horoscope'].includes(type));
+  document.getElementById('field-body-wrap').classList.toggle('hidden',  ['clock','ephemeris','image','weather','horoscope'].includes(type));
+  document.getElementById('field-image-wrap').classList.toggle('hidden', type !== 'image');
+  document.getElementById('field-city-wrap').classList.toggle('hidden',  type !== 'weather');
+  document.getElementById('field-sign-wrap').classList.toggle('hidden',  type !== 'horoscope');
   document.getElementById('slide-modal').classList.remove('hidden');
 };
 
@@ -643,6 +670,12 @@ window.closeSlideModal = () => document.getElementById('slide-modal').classList.
 
 window.onSlideTypeChange = () => {
   const type = document.getElementById('slide-type').value;
+  // Vider les champs à chaque changement de type pour éviter les données résiduelles
+  document.getElementById('slide-title-input').value = '';
+  document.getElementById('slide-body-input').value  = '';
+  document.getElementById('slide-image-input').value = '';
+  document.getElementById('slide-city-input').value  = '';
+  // Afficher/masquer les champs selon le type
   document.getElementById('field-title-wrap').classList.toggle('hidden', ['clock','ephemeris','horoscope'].includes(type));
   document.getElementById('field-body-wrap').classList.toggle('hidden',  ['clock','ephemeris','image','weather','horoscope'].includes(type));
   document.getElementById('field-image-wrap').classList.toggle('hidden', type !== 'image');
@@ -697,15 +730,15 @@ document.getElementById('font-picker').addEventListener('click', e => {
   if (fp) setFont(fp.dataset.font);
 });
 
-// ── TABS ──
+// ── TABS éditeur ──
 window.switchTab = (name) => {
-  document.querySelectorAll('.tab').forEach(t => {
+  document.querySelectorAll('#editor-tabs .tab').forEach(t => {
     const n = t.getAttribute('onclick')?.match(/switchTab\('(\w+)'\)/)?.[1];
     t.classList.toggle('active', n === name);
   });
   document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
   const target = document.getElementById(`tab-${name}`);
-  if (target) { target.classList.add('active'); if (name === 'superadmin') loadSuperAdmin(); }
+  if (target) target.classList.add('active');
 };
 
 // ── DISPLAY URL ──
@@ -720,65 +753,103 @@ window.copyLink = () => {
 window.openDisplay = () => window.open(document.getElementById('display-url').textContent, '_blank');
 
 // ── SUPER ADMIN ──
-async function loadSuperAdmin() {
+window.saLoadAllStores = async () => {
   if (!isSuperAdmin) return;
-  // Charger toutes les exceptions existantes
-  const snap = await get(ref(db, 'overrides'));
-  const container = document.getElementById('sa-overrides');
+  const container = document.getElementById('sa-all-stores');
+  container.innerHTML = '<p class="sa-empty">Chargement…</p>';
+  const [storesSnap, idxSnap] = await Promise.all([
+    get(ref(db, 'stores')),
+    get(ref(db, 'userIndex'))
+  ]);
+  if (!storesSnap.exists()) { container.innerHTML = '<p class="sa-empty">Aucun établissement.</p>'; return; }
+  const idx = idxSnap.exists() ? idxSnap.val() : {};
   container.innerHTML = '';
-  if (!snap.exists()) {
-    container.innerHTML = '<p class="sa-empty">Aucune exception active.</p>';
-    return;
-  }
-  Object.entries(snap.val()).forEach(([uid, d]) => {
-    container.appendChild(buildOverrideCard(uid, d));
+  Object.entries(storesSnap.val()).forEach(([sid, d]) => {
+    const email = idx[d.ownerId] || d.ownerId;
+    const card  = document.createElement('div');
+    card.className = 'sa-user-card';
+    card.innerHTML = `
+      <h4>${d.name || '(sans nom)'}</h4>
+      <p>Propriétaire : <strong>${email}</strong><br>
+         Slides : <strong>${(d.slides||[]).length}</strong> · 
+         Thème : <strong>${d.color||d.theme||'dark'}</strong> · 
+         Police : <strong>${d.font||'inter'}</strong>
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="field" style="margin:0">
+          <label style="font-size:11px;color:var(--muted)">Renommer</label>
+          <input type="text" id="sa-rename-${sid}" value="${d.name||''}" style="width:180px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit" />
+        </div>
+        <button class="btn btn-secondary btn-sm" style="align-self:flex-end" onclick="saRenameStore('${sid}')">Renommer</button>
+        <button class="btn btn-danger btn-sm" style="align-self:flex-end" onclick="saDeleteStore('${sid}','${(d.name||'').replace(/'/g,"\\'")}')">Supprimer</button>
+      </div>`;
+    container.appendChild(card);
   });
-}
+};
+
+window.saRenameStore = async (sid) => {
+  const newName = document.getElementById(`sa-rename-${sid}`).value.trim();
+  if (!newName) return;
+  await set(ref(db, `stores/${sid}/name`), newName);
+  toast('Renommé ✓', 'ok');
+  saLoadAllStores();
+};
+
+window.saDeleteStore = async (sid, name) => {
+  if (!confirm(`Supprimer définitivement "${name}" ?`)) return;
+  await remove(ref(db, `stores/${sid}`));
+  toast(`"${name}" supprimé`, 'ok');
+  saLoadAllStores();
+};
+
+window.saLoadOverrides = async () => {
+  if (!isSuperAdmin) return;
+  const container = document.getElementById('sa-overrides');
+  container.innerHTML = '<p class="sa-empty">Chargement…</p>';
+  const snap = await get(ref(db, 'overrides'));
+  if (!snap.exists()) { container.innerHTML = '<p class="sa-empty">Aucune exception active.</p>'; return; }
+  container.innerHTML = '';
+  Object.entries(snap.val()).forEach(([uid, d]) => container.appendChild(buildOverrideCard(uid, d)));
+};
 
 window.saSearch = async () => {
-  const email = document.getElementById('sa-search-email').value.trim();
+  const email   = document.getElementById('sa-search-email').value.trim();
   if (!email) return;
   const results = document.getElementById('sa-results');
   results.innerHTML = '<p class="sa-empty">Recherche…</p>';
-
-  // Chercher dans stores par email n'est pas direct (on a uid),
-  // On cherche dans un index users si dispo, sinon on demande à chercher par UID manuellement
-  // Solution: stocker email→uid dans /userIndex à la connexion
-  const idxSnap = await get(ref(db, `userIndex`));
+  const idxSnap = await get(ref(db, 'userIndex'));
   let uid = null;
   if (idxSnap.exists()) {
     const idx = idxSnap.val();
     uid = Object.keys(idx).find(k => idx[k] === email) || null;
   }
-
   if (!uid) {
-    results.innerHTML = `<p class="sa-empty">Utilisateur introuvable.<br><small>L'utilisateur doit s'être connecté au moins une fois.</small></p>`;
+    results.innerHTML = `<p class="sa-empty">Utilisateur introuvable — il doit s'être connecté au moins une fois.</p>`;
     return;
   }
-
   const overSnap = await get(ref(db, `overrides/${uid}`));
   const existing = overSnap.exists() ? overSnap.val() : {};
   results.innerHTML = '';
-  results.appendChild(buildOverrideCard(uid, { email, ...existing }, true));
+  results.appendChild(buildOverrideCard(uid, { email, ...existing }));
 };
 
-function buildOverrideCard(uid, d, editable = false) {
-  const card = document.createElement('div');
-  card.className = 'sa-user-card';
-  const maxS = d.maxSlides ?? FREE_MAX_SLIDES;
+function buildOverrideCard(uid, d) {
+  const maxS  = d.maxSlides ?? FREE_MAX_SLIDES;
   const maxSt = d.maxStores ?? FREE_MAX_STORES;
   const hasOverride = d.maxSlides !== undefined || d.maxStores !== undefined;
+  const card  = document.createElement('div');
+  card.className = 'sa-user-card';
   card.innerHTML = `
     <h4>${d.email || uid} ${hasOverride ? '<span class="badge-override">⚡ Exception active</span>' : ''}</h4>
     <p>UID : <code style="font-size:11px;color:var(--muted)">${uid}</code></p>
     <div class="sa-limits">
       <div class="sa-limit-field">
         <label>Slides max</label>
-        <input type="number" min="1" max="50" value="${maxS}" id="sa-slides-${uid}" />
+        <input type="number" min="1" max="100" value="${maxS}" id="sa-slides-${uid}" />
       </div>
       <div class="sa-limit-field">
         <label>Établissements max</label>
-        <input type="number" min="1" max="20" value="${maxSt}" id="sa-stores-${uid}" />
+        <input type="number" min="1" max="50" value="${maxSt}" id="sa-stores-${uid}" />
       </div>
       <button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="saApply('${uid}','${d.email||''}')">Appliquer</button>
       ${hasOverride ? `<button class="btn btn-secondary btn-sm" style="margin-top:16px" onclick="saReset('${uid}')">Réinitialiser</button>` : ''}
@@ -791,22 +862,15 @@ window.saApply = async (uid, email) => {
   const maxStores = parseInt(document.getElementById(`sa-stores-${uid}`).value) || FREE_MAX_STORES;
   await set(ref(db, `overrides/${uid}`), { email, maxSlides, maxStores, updatedAt: Date.now() });
   toast('Exception appliquée ✓', 'ok');
-  loadSuperAdmin();
+  saLoadOverrides();
 };
 
 window.saReset = async (uid) => {
-  if (!confirm('Supprimer cette exception ?')) return;
+  if (!confirm('Supprimer cette exception et revenir aux limites par défaut ?')) return;
   await remove(ref(db, `overrides/${uid}`));
   toast('Exception supprimée', 'ok');
-  loadSuperAdmin();
+  saLoadOverrides();
 };
-
-// ── À la connexion, enregistrer email dans userIndex ──
-onAuthStateChanged(auth, user => {
-  if (user && user.email) {
-    set(ref(db, `userIndex/${user.uid}`), user.email);
-  }
-});
 
 // ── HELPERS ──
 function typeLabel(t) {
@@ -832,4 +896,3 @@ function toast(msg, type='ok') {
 </script>
 </body>
 </html>
-
