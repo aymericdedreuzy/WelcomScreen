@@ -427,7 +427,7 @@
           <li>Météo & horoscope</li>
           <li class="off">Support prioritaire</li>
         </ul>
-        <a href="admin.html" class="plan-btn pb-main">Choisir Commerce</a>
+        <a href="admin.html" class="plan-btn pb-main" id="btn-commerce">Choisir Commerce</a>
       </div>
       <div class="plan">
         <p class="plan-name">Pro</p>
@@ -441,7 +441,7 @@
           <li>Météo & horoscope</li>
           <li>Support prioritaire</li>
         </ul>
-        <a href="admin.html" class="plan-btn pb-ghost">Choisir Pro</a>
+        <a href="admin.html" class="plan-btn pb-ghost" id="btn-pro">Choisir Pro</a>
       </div>
     </div>
   </div>
@@ -464,7 +464,33 @@
   </div>
 </footer>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBGjPegcDDlqqrltWhhWaWHBxPw2JxYC2Q",
+  authDomain: "welcomscreen-b6bff.firebaseapp.com",
+  databaseURL: "https://welcomscreen-b6bff-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "welcomscreen-b6bff",
+  storageBucket: "welcomscreen-b6bff.firebasestorage.app",
+  messagingSenderId: "801754342081",
+  appId: "1:801754342081:web:26f60f9b66589e690daa40"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// Charger les liens Stripe et les injecter dans les boutons de pricing
+get(ref(db, 'config/stripe')).then(snap => {
+  if (!snap.exists()) return;
+  const { commerce, pro } = snap.val();
+  const btnCommerce = document.getElementById('btn-commerce');
+  const btnPro      = document.getElementById('btn-pro');
+  if (commerce && btnCommerce) btnCommerce.href = commerce;
+  if (pro      && btnPro)      btnPro.href      = pro;
+}).catch(() => {}); // Silencieux si Firebase non dispo
+</script>
 // ── Saints (extrait clé pour la démo) ──
 const SAINTS = {
   "6-29":{n:"Pierre et Paul",s:"⛪",h:"Les deux piliers de l'Église, martyrisés à Rome."},
