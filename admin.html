@@ -457,7 +457,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-         onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult }
+         onAuthStateChanged, GoogleAuthProvider, signInWithPopup }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, set, get, remove, query, orderByChild, equalTo }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -479,22 +479,9 @@ const FREE_MAX_STORES   = 1;
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
+// Google Auth provider
 const gProvider = new GoogleAuthProvider();
-
-// Récupérer le résultat du redirect Google au retour sur la page
-// et forcer onAuthStateChanged à se déclencher avec le bon user
-getRedirectResult(auth).then(result => {
-  if (result?.user) {
-    // La session est établie — onAuthStateChanged prendra le relais
-    console.log('Google redirect OK:', result.user.email);
-  }
-}).catch(e => {
-  console.error('Redirect error:', e.code, e.message);
-  if (e.code) {
-    const m = document.getElementById('login-msg');
-    if (m) { m.textContent = friendlyError(e.code); m.className = 'msg error'; }
-  }
-});
+gProvider.setCustomParameters({ prompt: 'select_account' });
 
 let currentUser  = null;
 let currentStore = null;
@@ -524,24 +511,11 @@ window.doRegister = async () => {
   catch(e) { msg.textContent = friendlyError(e.code); msg.className = 'msg error'; }
 };
 
-window.doGoogleLogin = async () => {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  try {
-    if (isMobile) {
-      await signInWithRedirect(auth, gProvider);
-    } else {
-      await signInWithPopup(auth, gProvider);
-    }
-  } catch(e) {
-    // Si popup bloquée, fallback sur redirect
-    if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
-      await signInWithRedirect(auth, gProvider);
-    } else {
-      const m = document.getElementById('login-msg');
-      m.textContent = friendlyError(e.code);
-      m.className = 'msg error';
-    }
-  }
+window.doGoogleLogin = () => {
+  signInWithPopup(auth, gProvider).catch(e => {
+    const m = document.getElementById('login-msg');
+    if (m) { m.textContent = friendlyError(e.code); m.className = 'msg error'; }
+  });
 };
 
 window.doLogout = () => signOut(auth);
