@@ -311,6 +311,22 @@
           <button class="btn btn-secondary" onclick="openDisplay()">🖥️ Ouvrir l'écran</button>
           <button class="btn btn-secondary" onclick="copyLink()">📋 Copier le lien</button>
         </div>
+
+        <div class="divider"></div>
+
+        <p class="section-label">QR Code de partage</p>
+        <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
+          Imprimez ou affichez ce QR code pour permettre à vos clients de scanner et accéder à l'écran depuis leur téléphone.
+        </p>
+        <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+          <div id="qr-container" style="background:#fff;padding:14px;border-radius:12px;display:inline-block;line-height:0;border:1px solid #e2e8f0;">
+            <img id="qr-img" src="" alt="QR Code" style="width:160px;height:160px;display:block;" />
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;justify-content:center">
+            <button class="btn btn-secondary" onclick="downloadQR()">⬇️ Télécharger le QR code</button>
+            <p style="font-size:12px;color:var(--muted);max-width:220px;line-height:1.6">Format PNG · Fond blanc · Prêt à imprimer ou à intégrer dans une affiche</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -320,6 +336,32 @@
         <button class="btn btn-secondary btn-sm" onclick="showScreen('stores')">← Mes établissements</button>
         <h2 style="font-size:20px;font-weight:700">⚙️ Super Admin</h2>
         <span style="font-size:13px;color:var(--muted)">— Gestion globale des licences et clients</span>
+      </div>
+
+      <!-- Liens Stripe -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <p class="section-label" style="margin:0">💳 Liens de paiement Stripe</p>
+          <button class="btn btn-secondary btn-sm" onclick="saLoadStripe()">🔄 Actualiser</button>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Ces liens sont utilisés sur la landing page pour les boutons "Choisir Commerce" et "Choisir Pro". Modifiez-les ici sans toucher au code.</p>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Plan Commerce — 5€/mois</label>
+            <div style="display:flex;gap:8px">
+              <input type="url" id="stripe-commerce" placeholder="https://buy.stripe.com/…" style="flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit" />
+              <button class="btn btn-primary btn-sm" onclick="saSaveStripe()">Enregistrer</button>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Plan Pro — 12€/mois</label>
+            <div style="display:flex;gap:8px">
+              <input type="url" id="stripe-pro" placeholder="https://buy.stripe.com/…" style="flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit" />
+              <button class="btn btn-primary btn-sm" onclick="saSaveStripe()">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--dim);margin-top:14px">💡 Les visiteurs de la landing page voient ces liens en temps réel. Laissez vide pour masquer le bouton de paiement.</p>
       </div>
 
       <!-- Recherche utilisateur -->
@@ -594,7 +636,7 @@ window.showScreen = (name) => {
     if (el) el.style.display = (s === name) ? 'block' : 'none';
   });
   if (name === 'stores') { currentStore = null; loadStores(); }
-  if (name === 'superadmin') { saLoadAllStores(); saLoadOverrides(); }
+  if (name === 'superadmin') { saLoadAllStores(); saLoadOverrides(); saLoadStripe(); }
 };
 
 window.backToStores = () => showScreen('stores'); // compat
@@ -755,18 +797,64 @@ window.switchTab = (name) => {
   if (target) target.classList.add('active');
 };
 
-// ── DISPLAY URL ──
+// ── DISPLAY URL + QR ──
 function updateDisplayUrl() {
   const base = location.href.split('?')[0].replace(/#.*$/, '').replace(/\/[^/]*$/, '/');
-  document.getElementById('display-url').textContent = `${base}display.html?store=${currentStore.id}`;
+  const url  = `${base}display.html?store=${currentStore.id}`;
+  document.getElementById('display-url').textContent = url;
+  generateQR(url);
 }
+
+function generateQR(url) {
+  const size = 160;
+  const encoded = encodeURIComponent(url);
+  const src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&bgcolor=ffffff&color=000000&margin=0&format=png`;
+  const img = document.getElementById('qr-img');
+  if (img) { img.src = src; img.dataset.url = url; }
+}
+
+window.downloadQR = () => {
+  const img = document.getElementById('qr-img');
+  if (!img || !img.src) return;
+  // Téléchargement via fetch blob pour éviter les restrictions CORS sur clic direct
+  fetch(img.src)
+    .then(r => r.blob())
+    .then(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `QR_${currentStore?.name || 'welcomscreen'}.png`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    })
+    .catch(() => {
+      // Fallback : ouvrir dans un nouvel onglet
+      window.open(img.src, '_blank');
+    });
+};
 window.copyLink = () => {
   navigator.clipboard.writeText(document.getElementById('display-url').textContent)
     .then(() => toast('Lien copié ✓', 'ok'));
 };
 window.openDisplay = () => window.open(document.getElementById('display-url').textContent, '_blank');
 
-// ── SUPER ADMIN ──
+// ── STRIPE LINKS ──
+window.saLoadStripe = async () => {
+  const snap = await get(ref(db, 'config/stripe'));
+  if (snap.exists()) {
+    const d = snap.val();
+    const c = document.getElementById('stripe-commerce');
+    const p = document.getElementById('stripe-pro');
+    if (c && d.commerce) c.value = d.commerce;
+    if (p && d.pro)      p.value = d.pro;
+  }
+};
+
+window.saSaveStripe = async () => {
+  const commerce = document.getElementById('stripe-commerce').value.trim();
+  const pro      = document.getElementById('stripe-pro').value.trim();
+  await set(ref(db, 'config/stripe'), { commerce, pro, updatedAt: Date.now() });
+  toast('Liens Stripe enregistrés ✓', 'ok');
+};
 window.saLoadAllStores = async () => {
   if (!isSuperAdmin) return;
   const container = document.getElementById('sa-all-stores');
