@@ -457,14 +457,14 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-         onAuthStateChanged, GoogleAuthProvider, signInWithRedirect, getRedirectResult }
+         onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, set, get, remove, query, orderByChild, equalTo }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBGjPegcDDlqqrltWhhWaWHBxPw2JxYC2Q",
-  authDomain: "aymericdedreuzy.github.io",
+  authDomain: "welcomscreen-b6bff.firebaseapp.com",
   databaseURL: "https://welcomscreen-b6bff-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "welcomscreen-b6bff",
   storageBucket: "welcomscreen-b6bff.firebasestorage.app",
@@ -525,12 +525,22 @@ window.doRegister = async () => {
 };
 
 window.doGoogleLogin = async () => {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   try {
-    await signInWithRedirect(auth, gProvider);
+    if (isMobile) {
+      await signInWithRedirect(auth, gProvider);
+    } else {
+      await signInWithPopup(auth, gProvider);
+    }
   } catch(e) {
-    const m = document.getElementById('login-msg');
-    m.textContent = friendlyError(e.code);
-    m.className = 'msg error';
+    // Si popup bloquée, fallback sur redirect
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
+      await signInWithRedirect(auth, gProvider);
+    } else {
+      const m = document.getElementById('login-msg');
+      m.textContent = friendlyError(e.code);
+      m.className = 'msg error';
+    }
   }
 };
 
