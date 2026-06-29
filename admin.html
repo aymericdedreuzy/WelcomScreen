@@ -464,7 +464,7 @@ import { getDatabase, ref, set, get, remove, query, orderByChild, equalTo }
 
 const firebaseConfig = {
   apiKey: "AIzaSyBGjPegcDDlqqrltWhhWaWHBxPw2JxYC2Q",
-  authDomain: "welcomscreen-b6bff.firebaseapp.com",
+  authDomain: "aymericdedreuzy.github.io",
   databaseURL: "https://welcomscreen-b6bff-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "welcomscreen-b6bff",
   storageBucket: "welcomscreen-b6bff.firebasestorage.app",
@@ -482,11 +482,17 @@ const db   = getDatabase(app);
 const gProvider = new GoogleAuthProvider();
 
 // Récupérer le résultat du redirect Google au retour sur la page
-getRedirectResult(auth).catch(e => {
+// et forcer onAuthStateChanged à se déclencher avec le bon user
+getRedirectResult(auth).then(result => {
+  if (result?.user) {
+    // La session est établie — onAuthStateChanged prendra le relais
+    console.log('Google redirect OK:', result.user.email);
+  }
+}).catch(e => {
+  console.error('Redirect error:', e.code, e.message);
   if (e.code) {
     const m = document.getElementById('login-msg');
-    m.textContent = friendlyError(e.code);
-    m.className = 'msg error';
+    if (m) { m.textContent = friendlyError(e.code); m.className = 'msg error'; }
   }
 });
 
