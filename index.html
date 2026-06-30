@@ -40,7 +40,6 @@
     .mock-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px;opacity:0;transition:opacity .9s ease;pointer-events:none;}
     .mock-slide.active{opacity:1;}
 
-    /* Slide styles pour le mockup */
     .ms-welcome{background:linear-gradient(150deg,#09090f 40%,#0f0e28);}
     .ms-w-title{font-family:'DM Serif Display',serif;font-size:clamp(1.3rem,3.3vw,2.5rem);color:#f0f0ff;margin-bottom:8px;text-align:center;line-height:1.15;}
     .ms-w-sub{font-size:clamp(.65rem,1.4vw,.9rem);color:#8888aa;text-align:center;}
@@ -81,9 +80,9 @@
 
     .hero-sub{font-size:clamp(.95rem,1.7vw,1.1rem);color:var(--muted);max-width:480px;margin:0 auto 36px;font-weight:300;line-height:1.7;}
     .hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-    .btn-main{background:var(--accent);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+    .btn-main{background:var(--accent);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:7px;cursor:pointer;border:none;font-family:inherit;}
     .btn-main:hover{background:#818cf8;transform:translateY(-1px);}
-    .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:400;text-decoration:none;transition:all .2s;}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:400;text-decoration:none;transition:all .2s;cursor:pointer;font-family:inherit;}
     .btn-ghost:hover{border-color:var(--accent);color:var(--text);}
     .hero-note{margin-top:14px;font-size:12px;color:var(--dim);}
 
@@ -110,13 +109,12 @@
     .feat-card h3{font-size:14px;font-weight:500;margin-bottom:6px;}
     .feat-card p{font-size:13px;color:var(--muted);line-height:1.65;font-weight:300;}
 
-    /* THEMES SECTION */
+    /* THEMES */
     #themes{padding:88px 24px;}
     .themes-intro{margin-bottom:52px;}
     .themes-counter{font-family:'DM Serif Display',serif;font-size:clamp(3rem,7vw,5.5rem);color:var(--accent2);line-height:1;margin-bottom:8px;}
     .themes-counter span{font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--muted);font-weight:300;margin-left:8px;vertical-align:middle;}
 
-    /* Grid couleurs × polices */
     .combinator{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
     @media(max-width:700px){.combinator{grid-template-columns:1fr;}}
 
@@ -136,7 +134,6 @@
     .font-row .f-name{font-size:11px;color:var(--muted);font-family:'DM Sans',sans-serif;white-space:nowrap;}
     .font-row .f-style{font-size:10px;color:var(--dim);font-family:'DM Sans',sans-serif;white-space:nowrap;}
 
-    /* Preview live */
     .preview-live{margin-top:32px;border-radius:14px;overflow:hidden;border:1px solid var(--border);aspect-ratio:16/7;position:relative;transition:all .4s;}
     .preview-live-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;transition:background .5s;}
     .preview-live-title{font-size:clamp(1.4rem,4vw,3rem);font-weight:400;line-height:1.1;text-align:center;transition:font-family .3s,color .3s;}
@@ -177,7 +174,7 @@
     .plan-feats li::before{content:'✓';color:var(--success);font-weight:700;flex-shrink:0;}
     .plan-feats li.off{color:var(--dim);}
     .plan-feats li.off::before{content:'–';color:var(--dim);}
-    .plan-btn{display:block;text-align:center;padding:11px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s;}
+    .plan-btn{display:block;text-align:center;padding:11px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s;cursor:pointer;border:none;font-family:inherit;width:100%;}
     .pb-main{background:var(--accent);color:#fff;}
     .pb-main:hover{background:#818cf8;}
     .pb-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
@@ -223,32 +220,27 @@
   <div class="screen-wrap">
     <div class="screen-glow"></div>
     <div class="screen-frame">
-      <!-- Slide 0 : Welcome -->
       <div class="mock-slide ms-welcome active" id="ms-0">
         <div class="ms-w-title">Bienvenue chez nous !</div>
         <div class="ms-w-sub">Ouvert du mardi au samedi · 7h – 19h30</div>
         <div class="ms-w-badge">📺 WelcomScreen</div>
       </div>
-      <!-- Slide 1 : Horloge -->
       <div class="mock-slide ms-clock" id="ms-1">
         <div class="ms-clock-time" id="mock-time">--:--</div>
         <div class="ms-clock-date" id="mock-date"></div>
       </div>
-      <!-- Slide 2 : Éphéméride -->
       <div class="mock-slide ms-ephem" id="ms-2">
         <div class="ms-e-symbol" id="mock-symbol">✨</div>
         <div class="ms-e-label">Aujourd'hui nous fêtons les</div>
         <div class="ms-e-name" id="mock-saint">—</div>
         <div class="ms-e-story" id="mock-story"></div>
       </div>
-      <!-- Slide 3 : Météo -->
       <div class="mock-slide ms-weather" id="ms-3">
         <div class="ms-w-city">Toulon</div>
         <div class="ms-w-icon">☀️</div>
         <div class="ms-w-temp">24°</div>
         <div class="ms-w-desc">Ciel dégagé</div>
       </div>
-      <!-- Slide 4 : Horoscope -->
       <div class="mock-slide ms-horoscope" id="ms-4">
         <div class="ms-h-sign">♊</div>
         <div class="ms-h-name">Gémeaux · 21 mai – 20 juin</div>
@@ -306,9 +298,7 @@
       <div class="themes-counter">64 <span>combinaisons visuelles</span></div>
       <p class="sec-sub">Choisissez une couleur d'ambiance et une police d'affichage. Ce que vous voyez ci-dessous est exactement ce qui s'affichera sur votre écran.</p>
     </div>
-
     <div class="combinator">
-      <!-- Colonne gauche : couleurs -->
       <div class="combo-col">
         <h3>8 couleurs d'ambiance</h3>
         <div class="colors-grid">
@@ -322,8 +312,6 @@
           <div class="color-tile" data-color="sand"   style="background:linear-gradient(135deg,#faf6f0,#f0e6d3)"><span class="label">Sable</span></div>
         </div>
       </div>
-
-      <!-- Colonne droite : polices -->
       <div class="combo-col">
         <h3>8 polices d'affichage</h3>
         <div class="fonts-list">
@@ -338,8 +326,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Preview live -->
     <div class="preview-live" id="preview-live">
       <div class="preview-live-inner" id="preview-inner">
         <div class="preview-live-label" id="preview-label">Aujourd'hui nous fêtons les</div>
@@ -400,6 +386,7 @@
     <h2 class="sec-title">Simple et transparent</h2>
     <p class="sec-sub">Commencez gratuitement, passez au plan supérieur quand vous en avez besoin.</p>
     <div class="price-grid">
+      <!-- Gratuit -->
       <div class="plan">
         <p class="plan-name">Gratuit</p>
         <div class="plan-price">0€ <span>/ mois</span></div>
@@ -414,6 +401,7 @@
         </ul>
         <a href="admin.html" class="plan-btn pb-ghost">Commencer gratuitement</a>
       </div>
+      <!-- Commerce -->
       <div class="plan featured">
         <div class="plan-badge">⭐ Le plus populaire</div>
         <p class="plan-name">Commerce</p>
@@ -427,8 +415,9 @@
           <li>Météo & horoscope</li>
           <li class="off">Support prioritaire</li>
         </ul>
-        <a href="admin.html" class="plan-btn pb-main" id="btn-commerce">Choisir Commerce</a>
+        <button class="plan-btn pb-main" id="btn-commerce">Choisir Commerce</button>
       </div>
+      <!-- Pro -->
       <div class="plan">
         <p class="plan-name">Pro</p>
         <div class="plan-price" id="price-pro-display">12€ <span>/ mois</span></div>
@@ -441,7 +430,7 @@
           <li>Météo & horoscope</li>
           <li>Support prioritaire</li>
         </ul>
-        <a href="admin.html" class="plan-btn pb-ghost" id="btn-pro">Choisir Pro</a>
+        <button class="plan-btn pb-ghost" id="btn-pro">Choisir Pro</button>
       </div>
     </div>
   </div>
@@ -467,6 +456,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBGjPegcDDlqqrltWhhWaWHBxPw2JxYC2Q",
@@ -478,30 +468,63 @@ const firebaseConfig = {
   appId: "1:801754342081:web:26f60f9b66589e690daa40"
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
+const app  = initializeApp(firebaseConfig);
+const db   = getDatabase(app);
+const auth = getAuth(app);
 
-// Charger les tarifs et liens Stripe et les injecter dans les boutons de pricing
+// ── État utilisateur ──
+let currentUid   = null;
+let currentEmail = null;
+let stripeUrls   = { commerce: '', pro: '' };
+
+onAuthStateChanged(auth, user => {
+  currentUid   = user?.uid   || null;
+  currentEmail = user?.email || null;
+});
+
+// ── Redirection vers Stripe avec UID ──
+function goToStripe(plan) {
+  const base = stripeUrls[plan];
+  if (!base) return;
+  // Utilisateur non connecté → on l'envoie s'inscrire puis il reviendra via le panneau upgrade
+  if (!currentUid) {
+    window.location.href = 'admin.html';
+    return;
+  }
+  const url = new URL(base);
+  url.searchParams.set('client_reference_id', currentUid);
+  url.searchParams.set('prefilled_email', currentEmail);
+  window.open(url.toString(), '_blank');
+}
+
+// ── Charger tarifs & liens Stripe ──
 get(ref(db, 'config/stripe')).then(snap => {
   if (!snap.exists()) return;
   const { commerce, pro, priceCommerce, pricePro } = snap.val();
-  const btnCommerce = document.getElementById('btn-commerce');
-  const btnPro      = document.getElementById('btn-pro');
+
+  // Stocker les URLs
+  stripeUrls.commerce = commerce || '';
+  stripeUrls.pro      = pro      || '';
+
+  // Mettre à jour les prix affichés
   const priceCommerceEl = document.getElementById('price-commerce-display');
   const priceProEl      = document.getElementById('price-pro-display');
-  if (commerce && btnCommerce) btnCommerce.href = commerce;
-  if (pro      && btnPro)      btnPro.href      = pro;
-  if (priceCommerce !== undefined && priceCommerceEl) {
+  if (priceCommerce !== undefined && priceCommerceEl)
     priceCommerceEl.innerHTML = `${priceCommerce}€ <span>/ mois</span>`;
-  }
-  if (pricePro !== undefined && priceProEl) {
+  if (pricePro !== undefined && priceProEl)
     priceProEl.innerHTML = `${pricePro}€ <span>/ mois</span>`;
-  }
-}).catch(() => {}); // Silencieux si Firebase non dispo
-</script>
 
-<script>
-// ── Saints (extrait clé pour la démo) ──
+  // Brancher les boutons sur goToStripe
+  const btnCommerce = document.getElementById('btn-commerce');
+  const btnPro      = document.getElementById('btn-pro');
+  if (btnCommerce) btnCommerce.onclick = () => goToStripe('commerce');
+  if (btnPro)      btnPro.onclick      = () => goToStripe('pro');
+
+}).catch(() => {
+  // Fallback silencieux : les boutons restent sans action
+});
+
+// ── Saints ──
 const SAINTS = {
   "6-29":{n:"Pierre et Paul",s:"⛪",h:"Les deux piliers de l'Église, martyrisés à Rome."},
   "6-27":{n:"Fernand",s:"⚔️",h:"Saint Ferdinand III de Castille reconquit Séville en 1248."},
@@ -518,38 +541,36 @@ const SAINTS = {
   "4-23":{n:"Georges",s:"🐉",h:"Soldat martyr, symbole du bien contre le mal."},
   "5-1":{n:"Fête du Travail",s:"⚒️",h:"Commémoration des martyrs de Chicago de 1886."},
 };
-const now = new Date();
-const key = `${now.getMonth()+1}-${now.getDate()}`;
+const now  = new Date();
+const key  = `${now.getMonth()+1}-${now.getDate()}`;
 const saint = SAINTS[key] || {n:"—", s:"✨", h:""};
-const sEl = document.getElementById('mock-saint');
-const symEl = document.getElementById('mock-symbol');
+const sEl    = document.getElementById('mock-saint');
+const symEl  = document.getElementById('mock-symbol');
 const storyEl = document.getElementById('mock-story');
-if(sEl)    sEl.textContent    = saint.n;
-if(symEl)  symEl.textContent  = saint.s;
-if(storyEl)storyEl.textContent= saint.h;
-
-// Aussi dans la preview des thèmes
+if (sEl)     sEl.textContent     = saint.n;
+if (symEl)   symEl.textContent   = saint.s;
+if (storyEl) storyEl.textContent = saint.h;
 const previewTitle = document.getElementById('preview-title');
-if(previewTitle) previewTitle.textContent = saint.n;
+if (previewTitle) previewTitle.textContent = saint.n;
 
 // ── Horloge ──
-function updateClock(){
-  const n = new Date();
-  const h = String(n.getHours()).padStart(2,'0');
-  const m = String(n.getMinutes()).padStart(2,'0');
+function updateClock() {
+  const n  = new Date();
+  const h  = String(n.getHours()).padStart(2,'0');
+  const m  = String(n.getMinutes()).padStart(2,'0');
   const el = document.getElementById('mock-time');
   const dl = document.getElementById('mock-date');
-  if(el) el.textContent = `${h}:${m}`;
-  if(dl) dl.textContent = n.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  if (el) el.textContent = `${h}:${m}`;
+  if (dl) dl.textContent = n.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
 }
-setInterval(updateClock,1000);
+setInterval(updateClock, 1000);
 updateClock();
 
 // ── Slideshow mockup ──
 let idx = 0;
-const N = 5;
+const N   = 5;
 const DUR = 3400;
-function nextSlide(){
+function nextSlide() {
   document.querySelectorAll('.mock-slide').forEach((el,i) => el.classList.toggle('active', i === idx));
   const bar = document.getElementById('mock-bar');
   bar.style.transition = 'none'; bar.style.width = '0%';
@@ -575,7 +596,7 @@ let currentColor = 'dark';
 let currentFont  = "'Inter',sans-serif";
 
 function applyPreview() {
-  const t = THEMES[currentColor];
+  const t     = THEMES[currentColor];
   const inner = document.getElementById('preview-inner');
   const title = document.getElementById('preview-title');
   const sub   = document.getElementById('preview-sub');
