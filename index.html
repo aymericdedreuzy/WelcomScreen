@@ -177,7 +177,7 @@
     .plan-feats li::before{content:'✓';color:var(--success);font-weight:700;flex-shrink:0;}
     .plan-feats li.off{color:var(--dim);}
     .plan-feats li.off::before{content:'–';color:var(--dim);}
-    .plan-btn{display:block;width:100%;text-align:center;padding:11px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s;border:none;cursor:pointer;font-family:inherit;}
+    .plan-btn{display:block;text-align:center;padding:11px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s;}
     .pb-main{background:var(--accent);color:#fff;}
     .pb-main:hover{background:#818cf8;}
     .pb-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
@@ -427,7 +427,7 @@
           <li>Météo & horoscope</li>
           <li class="off">Support prioritaire</li>
         </ul>
-        <button class="plan-btn pb-main" id="btn-commerce" onclick="redirigerVersStripe(this.dataset.stripeUrl)">Choisir Commerce</button>
+        <a href="admin.html" class="plan-btn pb-main" id="btn-commerce">Choisir Commerce</a>
       </div>
       <div class="plan">
         <p class="plan-name">Pro</p>
@@ -441,7 +441,7 @@
           <li>Météo & horoscope</li>
           <li>Support prioritaire</li>
         </ul>
-        <button class="plan-btn pb-ghost" id="btn-pro" onclick="redirigerVersStripe(this.dataset.stripeUrl)">Choisir Pro</button>
+        <a href="admin.html" class="plan-btn pb-ghost" id="btn-pro">Choisir Pro</a>
       </div>
     </div>
   </div>
@@ -467,7 +467,6 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBGjPegcDDlqqrltWhhWaWHBxPw2JxYC2Q",
@@ -479,13 +478,8 @@ const firebaseConfig = {
   appId: "1:801754342081:web:26f60f9b66589e690daa40"
 };
 
-const app  = initializeApp(firebaseConfig);
-const db   = getDatabase(app);
-const auth = getAuth(app);
-
-// Garder une trace de l'utilisateur connecté pour le paiement Stripe
-let currentUser = null;
-onAuthStateChanged(auth, user => { currentUser = user; });
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
 
 // Charger les tarifs et liens Stripe et les injecter dans les boutons de pricing
 get(ref(db, 'config/stripe')).then(snap => {
@@ -495,9 +489,8 @@ get(ref(db, 'config/stripe')).then(snap => {
   const btnPro      = document.getElementById('btn-pro');
   const priceCommerceEl = document.getElementById('price-commerce-display');
   const priceProEl      = document.getElementById('price-pro-display');
-  // On stocke le lien Stripe "de base" en data-attribute, sans UID pour l'instant
-  if (commerce && btnCommerce) btnCommerce.dataset.stripeUrl = commerce;
-  if (pro      && btnPro)      btnPro.dataset.stripeUrl      = pro;
+  if (commerce && btnCommerce) btnCommerce.href = commerce;
+  if (pro      && btnPro)      btnPro.href      = pro;
   if (priceCommerce !== undefined && priceCommerceEl) {
     priceCommerceEl.innerHTML = `${priceCommerce}€ <span>/ mois</span>`;
   }
@@ -505,25 +498,6 @@ get(ref(db, 'config/stripe')).then(snap => {
     priceProEl.innerHTML = `${pricePro}€ <span>/ mois</span>`;
   }
 }).catch(() => {}); // Silencieux si Firebase non dispo
-
-// ── Fonction universelle pour lancer un paiement Stripe lié au compte Firebase ──
-window.redirigerVersStripe = (lienStripeDeBase) => {
-  if (!lienStripeDeBase) {
-    // Pas de lien configuré → fallback vers l'espace admin
-    window.location.href = 'admin.html';
-    return;
-  }
-  if (!currentUser) {
-    alert("Veuillez vous connecter pour souscrire à une offre.");
-    window.location.href = 'admin.html';
-    return;
-  }
-  // On ajoute l'UID Firebase pour que le webhook Stripe → Firebase
-  // sache à quel compte attribuer le paiement
-  const separator  = lienStripeDeBase.includes('?') ? '&' : '?';
-  const lienAjuste = `${lienStripeDeBase}${separator}client_reference_id=${currentUser.uid}`;
-  window.location.href = lienAjuste;
-};
 </script>
 
 <script>
