@@ -338,30 +338,37 @@
         <span style="font-size:13px;color:var(--muted)">— Gestion globale des licences et clients</span>
       </div>
 
-      <!-- Liens Stripe -->
+      <!-- Liens Stripe + Tarifs -->
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <p class="section-label" style="margin:0">💳 Liens de paiement Stripe</p>
+          <p class="section-label" style="margin:0">💳 Tarifs & liens de paiement Stripe</p>
           <button class="btn btn-secondary btn-sm" onclick="saLoadStripe()">🔄 Actualiser</button>
         </div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Ces liens sont utilisés sur la landing page pour les boutons "Choisir Commerce" et "Choisir Pro". Modifiez-les ici sans toucher au code.</p>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Ajustez les prix affichés et les liens de paiement sur la landing page, sans toucher au code.</p>
         <div style="display:flex;flex-direction:column;gap:14px">
           <div>
-            <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Plan Commerce — 5€/mois</label>
-            <div style="display:flex;gap:8px">
-              <input type="url" id="stripe-commerce" placeholder="https://buy.stripe.com/…" style="flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit" />
-              <button class="btn btn-primary btn-sm" onclick="saSaveStripe()">Enregistrer</button>
+            <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Plan Commerce</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0 12px">
+                <input type="number" id="price-commerce" min="0" step="0.5" placeholder="5" style="width:60px;padding:10px 0;background:transparent;border:none;color:var(--text);font-size:14px;font-family:inherit;text-align:right" />
+                <span style="font-size:13px;color:var(--muted)">€ / mois</span>
+              </div>
+              <input type="url" id="stripe-commerce" placeholder="https://buy.stripe.com/…" style="flex:1;min-width:200px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit" />
             </div>
           </div>
           <div>
-            <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Plan Pro — 12€/mois</label>
-            <div style="display:flex;gap:8px">
-              <input type="url" id="stripe-pro" placeholder="https://buy.stripe.com/…" style="flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit" />
-              <button class="btn btn-primary btn-sm" onclick="saSaveStripe()">Enregistrer</button>
+            <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Plan Pro</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0 12px">
+                <input type="number" id="price-pro" min="0" step="0.5" placeholder="12" style="width:60px;padding:10px 0;background:transparent;border:none;color:var(--text);font-size:14px;font-family:inherit;text-align:right" />
+                <span style="font-size:13px;color:var(--muted)">€ / mois</span>
+              </div>
+              <input type="url" id="stripe-pro" placeholder="https://buy.stripe.com/…" style="flex:1;min-width:200px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit" />
             </div>
           </div>
+          <button class="btn btn-primary btn-sm" style="align-self:flex-start;margin-top:4px" onclick="saSaveStripe()">💾 Enregistrer tarifs & liens</button>
         </div>
-        <p style="font-size:12px;color:var(--dim);margin-top:14px">💡 Les visiteurs de la landing page voient ces liens en temps réel. Laissez vide pour masquer le bouton de paiement.</p>
+        <p style="font-size:12px;color:var(--dim);margin-top:14px">💡 Les visiteurs de la landing page voient ces prix et liens en temps réel. Laissez un lien vide pour masquer le bouton de paiement correspondant.</p>
       </div>
 
       <!-- Recherche utilisateur -->
@@ -827,23 +834,29 @@ window.copyLink = () => {
 };
 window.openDisplay = () => window.open(document.getElementById('display-url').textContent, '_blank');
 
-// ── STRIPE LINKS ──
+// ── STRIPE LINKS + TARIFS ──
 window.saLoadStripe = async () => {
   const snap = await get(ref(db, 'config/stripe'));
   if (snap.exists()) {
     const d = snap.val();
-    const c = document.getElementById('stripe-commerce');
-    const p = document.getElementById('stripe-pro');
-    if (c && d.commerce) c.value = d.commerce;
-    if (p && d.pro)      p.value = d.pro;
+    const c  = document.getElementById('stripe-commerce');
+    const p  = document.getElementById('stripe-pro');
+    const pc = document.getElementById('price-commerce');
+    const pp = document.getElementById('price-pro');
+    if (c  && d.commerce)      c.value  = d.commerce;
+    if (p  && d.pro)           p.value  = d.pro;
+    if (pc && d.priceCommerce !== undefined) pc.value = d.priceCommerce;
+    if (pp && d.pricePro      !== undefined) pp.value = d.pricePro;
   }
 };
 
 window.saSaveStripe = async () => {
-  const commerce = document.getElementById('stripe-commerce').value.trim();
-  const pro      = document.getElementById('stripe-pro').value.trim();
-  await set(ref(db, 'config/stripe'), { commerce, pro, updatedAt: Date.now() });
-  toast('Liens Stripe enregistrés ✓', 'ok');
+  const commerce      = document.getElementById('stripe-commerce').value.trim();
+  const pro           = document.getElementById('stripe-pro').value.trim();
+  const priceCommerce = parseFloat(document.getElementById('price-commerce').value) || 5;
+  const pricePro       = parseFloat(document.getElementById('price-pro').value) || 12;
+  await set(ref(db, 'config/stripe'), { commerce, pro, priceCommerce, pricePro, updatedAt: Date.now() });
+  toast('Tarifs & liens enregistrés ✓', 'ok');
 };
 window.saLoadAllStores = async () => {
   if (!isSuperAdmin) return;
