@@ -417,7 +417,7 @@
       <div class="plan featured">
         <div class="plan-badge">⭐ Le plus populaire</div>
         <p class="plan-name">Commerce</p>
-        <div class="plan-price">5€ <span>/ mois</span></div>
+        <div class="plan-price" id="price-commerce-display">5€ <span>/ mois</span></div>
         <p class="plan-desc">Tout pour un affichage professionnel.</p>
         <ul class="plan-feats">
           <li>1 établissement</li>
@@ -431,7 +431,7 @@
       </div>
       <div class="plan">
         <p class="plan-name">Pro</p>
-        <div class="plan-price">12€ <span>/ mois</span></div>
+        <div class="plan-price" id="price-pro-display">12€ <span>/ mois</span></div>
         <p class="plan-desc">Pour les multi-sites et besoins avancés.</p>
         <ul class="plan-feats">
           <li>Établissements illimités</li>
@@ -481,16 +481,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-// Charger les liens Stripe et les injecter dans les boutons de pricing
+// Charger les tarifs et liens Stripe et les injecter dans les boutons de pricing
 get(ref(db, 'config/stripe')).then(snap => {
   if (!snap.exists()) return;
-  const { commerce, pro } = snap.val();
+  const { commerce, pro, priceCommerce, pricePro } = snap.val();
   const btnCommerce = document.getElementById('btn-commerce');
   const btnPro      = document.getElementById('btn-pro');
+  const priceCommerceEl = document.getElementById('price-commerce-display');
+  const priceProEl      = document.getElementById('price-pro-display');
   if (commerce && btnCommerce) btnCommerce.href = commerce;
   if (pro      && btnPro)      btnPro.href      = pro;
+  if (priceCommerce !== undefined && priceCommerceEl) {
+    priceCommerceEl.innerHTML = `${priceCommerce}€ <span>/ mois</span>`;
+  }
+  if (pricePro !== undefined && priceProEl) {
+    priceProEl.innerHTML = `${pricePro}€ <span>/ mois</span>`;
+  }
 }).catch(() => {}); // Silencieux si Firebase non dispo
 </script>
+
+<script>
 // ── Saints (extrait clé pour la démo) ──
 const SAINTS = {
   "6-29":{n:"Pierre et Paul",s:"⛪",h:"Les deux piliers de l'Église, martyrisés à Rome."},
