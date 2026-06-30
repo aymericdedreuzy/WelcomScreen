@@ -90,6 +90,9 @@
     .plan-limit-banner{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#fcd34d;display:none;}
     .plan-limit-banner a{color:var(--accent2);cursor:pointer;text-decoration:underline;}
 
+    /* UPGRADE PANEL */
+    #upgrade-panel{display:none;margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px 24px;}
+
     /* MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px);}
     .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
@@ -100,7 +103,7 @@
     .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
     @media(max-width:600px){.settings-grid{grid-template-columns:1fr;}}
 
-    /* THEME PICKER — 2 niveaux */
+    /* THEME PICKER */
     .theme-section-label{font-size:12px;font-weight:600;color:var(--muted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.07em;}
     .color-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
     .color-swatch{width:36px;height:36px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative;}
@@ -135,7 +138,6 @@
     .sa-limit-field label{font-size:11px;color:var(--muted);font-weight:500;}
     .sa-limit-field input{width:80px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit;}
     .sa-limit-field input:focus{outline:none;border-color:var(--accent);}
-    .sa-search{margin-bottom:16px;}
     .sa-empty{font-size:14px;color:var(--muted);text-align:center;padding:32px;}
     .badge-override{display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#fcd34d;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;}
 
@@ -146,10 +148,6 @@
     .toast.err{border-color:var(--danger);color:#fca5a5;}
 
     .hidden{display:none!important;}
-    .spin{animation:spin .8s linear infinite;display:inline-block;}
-    @keyframes spin{to{transform:rotate(360deg);}}
-
-    /* Séparateur */
     .divider{height:1px;background:var(--border);margin:24px 0;}
   </style>
 </head>
@@ -243,11 +241,52 @@
         <div class="tab" onclick="switchTab('display')">Lien d'affichage</div>
       </div>
 
+      <!-- UPGRADE PANEL (commun à tous les onglets, affiché sous les tabs) -->
+      <div id="upgrade-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div>
+            <p style="font-size:16px;font-weight:700;margin-bottom:4px">Passer à la version payante</p>
+            <p style="font-size:13px;color:var(--muted)">Votre compte Firebase sera automatiquement activé après paiement.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="hideUpgradePanel()">✕ Fermer</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+          <!-- Commerce -->
+          <div style="background:var(--bg);border:1px solid var(--accent);border-radius:12px;padding:22px;position:relative">
+            <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:11px;font-weight:600;padding:2px 12px;border-radius:20px;white-space:nowrap">⭐ Le plus populaire</div>
+            <p style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Commerce</p>
+            <div id="upgrade-price-commerce" style="font-size:2rem;font-weight:700;margin-bottom:4px">5€ <span style="font-size:.85rem;font-weight:300;color:var(--muted)">/ mois</span></div>
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;margin:14px 0 18px;font-size:13px;color:var(--muted)">
+              <li>✓ 1 établissement</li>
+              <li>✓ 10 slides</li>
+              <li>✓ Météo &amp; horoscope</li>
+              <li>✓ 64 combinaisons visuelles</li>
+            </ul>
+            <button class="btn btn-primary" style="width:100%" onclick="goToStripe('commerce')">Choisir Commerce →</button>
+          </div>
+          <!-- Pro -->
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:22px">
+            <p style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Pro</p>
+            <div id="upgrade-price-pro" style="font-size:2rem;font-weight:700;margin-bottom:4px">12€ <span style="font-size:.85rem;font-weight:300;color:var(--muted)">/ mois</span></div>
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;margin:14px 0 18px;font-size:13px;color:var(--muted)">
+              <li>✓ Établissements illimités</li>
+              <li>✓ 10 slides</li>
+              <li>✓ Météo &amp; horoscope</li>
+              <li>✓ Support prioritaire</li>
+            </ul>
+            <button class="btn btn-secondary" style="width:100%" onclick="goToStripe('pro')">Choisir Pro →</button>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:16px;text-align:center">
+          🔒 Paiement sécurisé par Stripe · Résiliation à tout moment · Activation automatique
+        </p>
+      </div>
+
       <!-- SLIDES TAB -->
       <div id="tab-slides" class="tab-content active">
         <div class="plan-limit-banner" id="free-limit-banner">
           🔒 Plan Gratuit — limite de <strong>3 slides</strong> atteinte.
-          <a onclick="alert('Contactez-nous pour passer au plan Commerce !')">Passer au plan Commerce →</a>
+          <a onclick="showUpgradePanel()">Passer au plan Commerce →</a>
         </div>
         <div class="slides-list" id="slides-list"></div>
         <button class="btn btn-secondary" onclick="openSlideEditor(-1)" id="add-slide-btn">＋ Ajouter une slide</button>
@@ -368,7 +407,7 @@
           </div>
           <button class="btn btn-primary btn-sm" style="align-self:flex-start;margin-top:4px" onclick="saSaveStripe()">💾 Enregistrer tarifs & liens</button>
         </div>
-        <p style="font-size:12px;color:var(--dim);margin-top:14px">💡 Les visiteurs de la landing page voient ces prix et liens en temps réel. Laissez un lien vide pour masquer le bouton de paiement correspondant.</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:14px">💡 Les visiteurs de la landing page voient ces prix et liens en temps réel.</p>
       </div>
 
       <!-- Recherche utilisateur -->
@@ -466,7 +505,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
          onAuthStateChanged, GoogleAuthProvider, signInWithPopup }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getDatabase, ref, set, get, remove, query, orderByChild, equalTo }
+import { getDatabase, ref, set, get, remove }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
@@ -486,15 +525,15 @@ const FREE_MAX_STORES   = 1;
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
-// Google Auth provider
 const gProvider = new GoogleAuthProvider();
 gProvider.setCustomParameters({ prompt: 'select_account' });
 
-let currentUser  = null;
-let currentStore = null;
+let currentUser     = null;
+let currentStore    = null;
 let editingSlideIdx = -1;
-let userLimits   = { maxSlides: FREE_MAX_SLIDES, maxStores: FREE_MAX_STORES };
-let isSuperAdmin = false;
+let userLimits      = { maxSlides: FREE_MAX_SLIDES, maxStores: FREE_MAX_STORES };
+let isSuperAdmin    = false;
+let stripeLinks     = { commerce: '', pro: '' };
 
 // ── AUTH ──
 window.doLogin = async () => {
@@ -540,9 +579,9 @@ onAuthStateChanged(auth, async user => {
     isSuperAdmin = (user.email === SUPER_ADMIN_EMAIL);
     document.getElementById('sa-topbar-btn').style.display = isSuperAdmin ? 'inline-flex' : 'none';
     await loadUserLimits();
+    await loadStripeLinks();
     loadStores();
     showScreen('stores');
-    // Enregistrer email dans l'index pour recherche super admin
     set(ref(db, `userIndex/${user.uid}`), user.email);
   }
 });
@@ -560,33 +599,86 @@ async function loadUserLimits() {
   }
 }
 
+// ── STRIPE LINKS ──
+async function loadStripeLinks() {
+  const snap = await get(ref(db, 'config/stripe'));
+  if (snap.exists()) {
+    const d = snap.val();
+    stripeLinks.commerce = d.commerce || '';
+    stripeLinks.pro      = d.pro      || '';
+  }
+}
+
+window.goToStripe = (plan) => {
+  const base = stripeLinks[plan];
+  if (!base) { toast('Lien de paiement non configuré', 'err'); return; }
+  if (!currentUser) { toast('Vous devez être connecté', 'err'); return; }
+  const url = new URL(base);
+  url.searchParams.set('client_reference_id', currentUser.uid);
+  url.searchParams.set('prefilled_email', currentUser.email);
+  window.open(url.toString(), '_blank');
+};
+
+window.showUpgradePanel = () => {
+  const panel = document.getElementById('upgrade-panel');
+  panel.style.display = 'block';
+  // Mettre à jour les prix depuis Firebase
+  get(ref(db, 'config/stripe')).then(snap => {
+    if (!snap.exists()) return;
+    const d = snap.val();
+    const pc = document.getElementById('upgrade-price-commerce');
+    const pp = document.getElementById('upgrade-price-pro');
+    if (pc && d.priceCommerce !== undefined)
+      pc.innerHTML = `${d.priceCommerce}€ <span style="font-size:.85rem;font-weight:300;color:var(--muted)">/ mois</span>`;
+    if (pp && d.pricePro !== undefined)
+      pp.innerHTML = `${d.pricePro}€ <span style="font-size:.85rem;font-weight:300;color:var(--muted)">/ mois</span>`;
+  });
+  panel.scrollIntoView({ behavior: 'smooth' });
+};
+
+window.hideUpgradePanel = () => {
+  document.getElementById('upgrade-panel').style.display = 'none';
+};
+
 // ── STORES ──
 async function loadStores() {
-  const snap = await get(ref(db, 'stores'));
   const grid = document.getElementById('store-grid');
+  grid.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px">Chargement…</p>';
+
+  // Chaque user lit ses stores un par un via son ownerId
+  // On passe par la liste complète uniquement pour le super admin
+  // Pour les users normaux : on stocke les storeIds dans userStores/{uid}
   const myStores = [];
-  if (snap.exists()) {
-    Object.entries(snap.val()).forEach(([id, data]) => {
-      if (data.ownerId === currentUser.uid) myStores.push({ id, ...data });
-    });
+
+  if (isSuperAdmin) {
+    const snap = await get(ref(db, 'stores'));
+    if (snap.exists()) {
+      Object.entries(snap.val()).forEach(([id, data]) => {
+        if (data.ownerId === currentUser.uid) myStores.push({ id, ...data });
+      });
+    }
+  } else {
+    // Lecture via index userStores
+    const idxSnap = await get(ref(db, `userStores/${currentUser.uid}`));
+    if (idxSnap.exists()) {
+      const ids = Object.keys(idxSnap.val());
+      await Promise.all(ids.map(async id => {
+        const s = await get(ref(db, `stores/${id}`));
+        if (s.exists()) myStores.push({ id, ...s.val() });
+      }));
+    }
   }
+
   grid.innerHTML = '';
-  myStores.forEach(({ id, name, slides }) => {
+  myStores.forEach(({ id, name, slides, ...rest }) => {
     const card = document.createElement('div');
     card.className = 'store-card';
     card.innerHTML = `<h3>${name || 'Sans nom'}</h3><span>${(slides||[]).length} slide(s)</span>`;
-    card.onclick = () => openStore(id, { name, slides, ...snap.val()[id] });
+    card.onclick = () => openStore(id, { name, slides, ...rest });
     grid.appendChild(card);
   });
-  // Bouton nouveau établissement
+
   if (myStores.length < userLimits.maxStores) {
-    const btn = document.createElement('div');
-    btn.className = 'store-card store-new';
-    btn.innerHTML = '<span style="font-size:20px">＋</span> Nouvel établissement';
-    btn.onclick = openNewStore;
-    grid.appendChild(btn);
-  } else if (myStores.length === 0) {
-    // Toujours montrer le bouton si aucun store
     const btn = document.createElement('div');
     btn.className = 'store-card store-new';
     btn.innerHTML = '<span style="font-size:20px">＋</span> Nouvel établissement';
@@ -596,11 +688,11 @@ async function loadStores() {
 }
 
 window.openNewStore = async () => {
-  const snap = await get(ref(db, 'stores'));
-  let count = 0;
-  if (snap.exists()) Object.values(snap.val()).forEach(d => { if (d.ownerId === currentUser.uid) count++; });
+  const idxSnap = await get(ref(db, `userStores/${currentUser.uid}`));
+  const count = idxSnap.exists() ? Object.keys(idxSnap.val()).length : 0;
   if (count >= userLimits.maxStores) {
     toast(`Limite de ${userLimits.maxStores} établissement(s) atteinte.`, 'err');
+    showUpgradePanel();
     return;
   }
   const name = prompt("Nom de l'établissement :");
@@ -608,6 +700,8 @@ window.openNewStore = async () => {
   const id   = 'store_' + Date.now();
   const data = { name, ownerId: currentUser.uid, color: 'dark', font: 'inter', duration: 8, slides: [] };
   await set(ref(db, `stores/${id}`), data);
+  // Mettre à jour l'index userStores
+  await set(ref(db, `userStores/${currentUser.uid}/${id}`), true);
   toast('Établissement créé ✓', 'ok');
   loadStores();
   openStore(id, data);
@@ -617,16 +711,17 @@ window.openStore = (id, data) => {
   currentStore = { id, ...data, slides: data.slides || [] };
   showScreen('editor');
   document.getElementById('editor-title').textContent = currentStore.name;
-  document.getElementById('s-name').value = currentStore.name;
+  document.getElementById('s-name').value     = currentStore.name;
   document.getElementById('s-duration').value = currentStore.duration || 8;
   setColor(currentStore.color || currentStore.theme || 'dark');
   setFont(currentStore.font || 'inter');
   renderSlides();
   updateDisplayUrl();
+  hideUpgradePanel();
   switchTab('slides');
 };
 
-// ── NAVIGATION ENTRE ÉCRANS ──
+// ── NAVIGATION ──
 window.showScreen = (name) => {
   ['stores','editor','superadmin'].forEach(s => {
     const el = document.getElementById(`screen-${s}`);
@@ -636,14 +731,14 @@ window.showScreen = (name) => {
   if (name === 'superadmin') { saLoadAllStores(); saLoadOverrides(); saLoadStripe(); }
 };
 
-window.backToStores = () => showScreen('stores'); // compat
-
 window.saveAll = async () => {
   if (!currentStore) return;
   currentStore.name     = document.getElementById('s-name').value || currentStore.name;
   currentStore.duration = parseInt(document.getElementById('s-duration').value) || 8;
   const { id, ...data } = currentStore;
   await set(ref(db, `stores/${id}`), { ...data, ownerId: currentUser.uid });
+  // S'assurer que l'index est à jour
+  await set(ref(db, `userStores/${currentUser.uid}/${id}`), true);
   document.getElementById('editor-title').textContent = currentStore.name;
   toast('Enregistré ✓', 'ok');
   loadStores();
@@ -656,8 +751,9 @@ document.getElementById('delete-store-btn').addEventListener('click', async () =
   const storeName = currentStore.name;
   if (!confirm(`Supprimer "${storeName}" définitivement ? Cette action est irréversible.`)) return;
   try {
-    currentStore = null; // vider avant le remove pour éviter tout rechargement parasite
+    currentStore = null;
     await remove(ref(db, `stores/${storeId}`));
+    await remove(ref(db, `userStores/${currentUser.uid}/${storeId}`));
     showScreen('stores');
     toast(`"${storeName}" supprimé`, 'ok');
   } catch(e) {
@@ -670,7 +766,6 @@ document.getElementById('delete-store-btn').addEventListener('click', async () =
 function renderSlides() {
   const list = document.getElementById('slides-list');
   list.innerHTML = '';
-  const max = userLimits.maxSlides;
   currentStore.slides.forEach((s, i) => {
     const item = document.createElement('div');
     item.className = 'slide-item';
@@ -688,7 +783,7 @@ function renderSlides() {
       </div>`;
     list.appendChild(item);
   });
-  const atLimit = currentStore.slides.length >= max;
+  const atLimit = currentStore.slides.length >= userLimits.maxSlides;
   document.getElementById('free-limit-banner').style.display = atLimit ? 'block' : 'none';
   document.getElementById('add-slide-btn').style.display = atLimit ? 'none' : 'inline-flex';
 }
@@ -696,20 +791,18 @@ function renderSlides() {
 window.openSlideEditor = (idx) => {
   if (idx === -1 && currentStore.slides.length >= userLimits.maxSlides) {
     toast(`Limite de ${userLimits.maxSlides} slides atteinte`, 'err');
+    showUpgradePanel();
     return;
   }
   editingSlideIdx = idx;
   const s = idx >= 0 ? currentStore.slides[idx] : {};
   document.getElementById('modal-title').textContent = idx >= 0 ? 'Modifier la slide' : 'Nouvelle slide';
-  // Charger le type d'abord
-  document.getElementById('slide-type').value = s.type || 'message';
-  // Charger les valeurs existantes SANS déclencher onSlideTypeChange (qui viderait tout)
+  document.getElementById('slide-type').value        = s.type  || 'message';
   document.getElementById('slide-title-input').value = s.title || '';
   document.getElementById('slide-body-input').value  = s.body  || '';
   document.getElementById('slide-image-input').value = s.image || '';
   document.getElementById('slide-city-input').value  = s.city  || '';
   document.getElementById('slide-sign-input').value  = s.sign  || 'belier';
-  // Afficher/masquer les champs selon le type (sans vider)
   const type = s.type || 'message';
   document.getElementById('field-title-wrap').classList.toggle('hidden', ['clock','ephemeris','horoscope'].includes(type));
   document.getElementById('field-body-wrap').classList.toggle('hidden',  ['clock','ephemeris','image','weather','horoscope'].includes(type));
@@ -723,12 +816,10 @@ window.closeSlideModal = () => document.getElementById('slide-modal').classList.
 
 window.onSlideTypeChange = () => {
   const type = document.getElementById('slide-type').value;
-  // Vider les champs à chaque changement de type pour éviter les données résiduelles
   document.getElementById('slide-title-input').value = '';
   document.getElementById('slide-body-input').value  = '';
   document.getElementById('slide-image-input').value = '';
   document.getElementById('slide-city-input').value  = '';
-  // Afficher/masquer les champs selon le type
   document.getElementById('field-title-wrap').classList.toggle('hidden', ['clock','ephemeris','horoscope'].includes(type));
   document.getElementById('field-body-wrap').classList.toggle('hidden',  ['clock','ephemeris','image','weather','horoscope'].includes(type));
   document.getElementById('field-image-wrap').classList.toggle('hidden', type !== 'image');
@@ -783,7 +874,7 @@ document.getElementById('font-picker').addEventListener('click', e => {
   if (fp) setFont(fp.dataset.font);
 });
 
-// ── TABS éditeur ──
+// ── TABS ──
 window.switchTab = (name) => {
   document.querySelectorAll('#editor-tabs .tab').forEach(t => {
     const n = t.getAttribute('onclick')?.match(/switchTab\('(\w+)'\)/)?.[1];
@@ -804,16 +895,14 @@ function updateDisplayUrl() {
 
 function generateQR(url) {
   const size = 160;
-  const encoded = encodeURIComponent(url);
-  const src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&bgcolor=ffffff&color=000000&margin=0&format=png`;
-  const img = document.getElementById('qr-img');
+  const src  = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=000000&margin=0&format=png`;
+  const img  = document.getElementById('qr-img');
   if (img) { img.src = src; img.dataset.url = url; }
 }
 
 window.downloadQR = () => {
   const img = document.getElementById('qr-img');
   if (!img || !img.src) return;
-  // Téléchargement via fetch blob pour éviter les restrictions CORS sur clic direct
   fetch(img.src)
     .then(r => r.blob())
     .then(blob => {
@@ -823,30 +912,25 @@ window.downloadQR = () => {
       a.click();
       URL.revokeObjectURL(a.href);
     })
-    .catch(() => {
-      // Fallback : ouvrir dans un nouvel onglet
-      window.open(img.src, '_blank');
-    });
+    .catch(() => window.open(img.src, '_blank'));
 };
+
 window.copyLink = () => {
   navigator.clipboard.writeText(document.getElementById('display-url').textContent)
     .then(() => toast('Lien copié ✓', 'ok'));
 };
 window.openDisplay = () => window.open(document.getElementById('display-url').textContent, '_blank');
 
-// ── STRIPE LINKS + TARIFS ──
+// ── SUPER ADMIN : STRIPE ──
 window.saLoadStripe = async () => {
   const snap = await get(ref(db, 'config/stripe'));
   if (snap.exists()) {
     const d = snap.val();
-    const c  = document.getElementById('stripe-commerce');
-    const p  = document.getElementById('stripe-pro');
-    const pc = document.getElementById('price-commerce');
-    const pp = document.getElementById('price-pro');
-    if (c  && d.commerce)      c.value  = d.commerce;
-    if (p  && d.pro)           p.value  = d.pro;
-    if (pc && d.priceCommerce !== undefined) pc.value = d.priceCommerce;
-    if (pp && d.pricePro      !== undefined) pp.value = d.pricePro;
+    const el = (id) => document.getElementById(id);
+    if (el('stripe-commerce') && d.commerce)             el('stripe-commerce').value = d.commerce;
+    if (el('stripe-pro')     && d.pro)                   el('stripe-pro').value      = d.pro;
+    if (el('price-commerce') && d.priceCommerce != null) el('price-commerce').value  = d.priceCommerce;
+    if (el('price-pro')      && d.pricePro      != null) el('price-pro').value       = d.pricePro;
   }
 };
 
@@ -854,10 +938,15 @@ window.saSaveStripe = async () => {
   const commerce      = document.getElementById('stripe-commerce').value.trim();
   const pro           = document.getElementById('stripe-pro').value.trim();
   const priceCommerce = parseFloat(document.getElementById('price-commerce').value) || 5;
-  const pricePro       = parseFloat(document.getElementById('price-pro').value) || 12;
+  const pricePro      = parseFloat(document.getElementById('price-pro').value) || 12;
   await set(ref(db, 'config/stripe'), { commerce, pro, priceCommerce, pricePro, updatedAt: Date.now() });
+  // Recharger les liens locaux immédiatement
+  stripeLinks.commerce = commerce;
+  stripeLinks.pro      = pro;
   toast('Tarifs & liens enregistrés ✓', 'ok');
 };
+
+// ── SUPER ADMIN : STORES ──
 window.saLoadAllStores = async () => {
   if (!isSuperAdmin) return;
   const container = document.getElementById('sa-all-stores');
@@ -877,7 +966,7 @@ window.saLoadAllStores = async () => {
       <h4>${d.name || '(sans nom)'}</h4>
       <p>Propriétaire : <strong>${email}</strong><br>
          Slides : <strong>${(d.slides||[]).length}</strong> · 
-         Thème : <strong>${d.color||d.theme||'dark'}</strong> · 
+         Couleur : <strong>${d.color||d.theme||'dark'}</strong> · 
          Police : <strong>${d.font||'inter'}</strong>
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -886,7 +975,7 @@ window.saLoadAllStores = async () => {
           <input type="text" id="sa-rename-${sid}" value="${d.name||''}" style="width:180px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit" />
         </div>
         <button class="btn btn-secondary btn-sm" style="align-self:flex-end" onclick="saRenameStore('${sid}')">Renommer</button>
-        <button class="btn btn-danger btn-sm" style="align-self:flex-end" onclick="saDeleteStore('${sid}','${(d.name||'').replace(/'/g,"\\'")}')">Supprimer</button>
+        <button class="btn btn-danger btn-sm" style="align-self:flex-end" onclick="saDeleteStore('${sid}','${(d.name||'').replace(/'/g,"\\'")}','${d.ownerId||''}')">Supprimer</button>
       </div>`;
     container.appendChild(card);
   });
@@ -900,13 +989,15 @@ window.saRenameStore = async (sid) => {
   saLoadAllStores();
 };
 
-window.saDeleteStore = async (sid, name) => {
+window.saDeleteStore = async (sid, name, ownerId) => {
   if (!confirm(`Supprimer définitivement "${name}" ?`)) return;
   await remove(ref(db, `stores/${sid}`));
+  if (ownerId) await remove(ref(db, `userStores/${ownerId}/${sid}`));
   toast(`"${name}" supprimé`, 'ok');
   saLoadAllStores();
 };
 
+// ── SUPER ADMIN : OVERRIDES ──
 window.saLoadOverrides = async () => {
   if (!isSuperAdmin) return;
   const container = document.getElementById('sa-overrides');
@@ -922,32 +1013,13 @@ window.saSearch = async () => {
   if (!query) return;
   const results = document.getElementById('sa-results');
   results.innerHTML = '<p class="sa-empty">Recherche…</p>';
-
   const idxSnap = await get(ref(db, 'userIndex'));
   const idx     = idxSnap.exists() ? idxSnap.val() : {};
-
-  let uid   = null;
-  let email = null;
-
-  // Détecter si c'est un UID (pas d'@ et longueur typique Firebase ~28 chars) ou un email
   const looksLikeUid = !query.includes('@') && query.length > 15;
-
-  if (looksLikeUid) {
-    // Recherche directe par UID
-    uid   = query;
-    email = idx[uid] || null;
-  } else {
-    // Recherche par email dans l'index
-    uid   = Object.keys(idx).find(k => idx[k] === query) || null;
-    email = query;
-  }
-
-  if (!uid) {
-    results.innerHTML = `<p class="sa-empty">Utilisateur introuvable — il doit s'être connecté au moins une fois.</p>`;
-    return;
-  }
-
-  // Si email pas trouvé dans l'index mais UID saisi directement, on tente quand même
+  let uid = null, email = null;
+  if (looksLikeUid) { uid = query; email = idx[uid] || null; }
+  else { uid = Object.keys(idx).find(k => idx[k] === query) || null; email = query; }
+  if (!uid) { results.innerHTML = `<p class="sa-empty">Utilisateur introuvable — il doit s'être connecté au moins une fois.</p>`; return; }
   const overSnap = await get(ref(db, `overrides/${uid}`));
   const existing = overSnap.exists() ? overSnap.val() : {};
   results.innerHTML = '';
@@ -961,8 +1033,12 @@ function buildOverrideCard(uid, d) {
   const card  = document.createElement('div');
   card.className = 'sa-user-card';
   card.innerHTML = `
-    <h4>${d.email || uid} ${hasOverride ? '<span class="badge-override">⚡ Exception active</span>' : ''}</h4>
-    <p>UID : <code style="font-size:11px;color:var(--muted)">${uid}</code></p>
+    <h4>${d.email || uid} ${hasOverride ? '<span class="badge-override">⚡ Exception active</span>' : ''}
+    ${d.plan ? `<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(16,185,129,.15);border:1px solid var(--success);color:#6ee7b7;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;margin-left:6px">✓ ${d.plan}</span>` : ''}
+    </h4>
+    <p>UID : <code style="font-size:11px;color:var(--muted)">${uid}</code>
+    ${d.subscriptionId ? `<br>Subscription Stripe : <code style="font-size:11px;color:var(--muted)">${d.subscriptionId}</code>` : ''}
+    </p>
     <div class="sa-limits">
       <div class="sa-limit-field">
         <label>Slides max</label>
