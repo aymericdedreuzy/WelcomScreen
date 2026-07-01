@@ -129,91 +129,23 @@ const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
 // ── Saints + histoire + symbole ──
-const SAINTS = {
-  "1-1":{n:"Marie",s:"👑",h:"Mère de Jésus, vénérée comme Reine du Ciel, première figure du calendrier chrétien."},
-  "1-2":{n:"Basile",s:"📜",h:"Évêque de Césarée au IVe siècle, Père de l'Église d'Orient, fondateur du monachisme cénobitique."},
-  "1-3":{n:"Geneviève",s:"🕯️",h:"Patronne de Paris, elle aurait détourné Attila et les Huns de la ville en 451 par ses prières."},
-  "1-4":{n:"Odilon",s:"⛪",h:"Abbé de Cluny, il instaura la fête des Défunts (2 novembre) dans tout l'Occident chrétien."},
-  "1-6":{n:"Melchior",s:"⭐",h:"L'un des Rois Mages venus d'Orient apporter l'or, l'encens et la myrrhe à l'Enfant Jésus."},
-  "1-13":{n:"Yvette",s:"🌿",h:"Sainte médiévale de Huy (Belgique), recluse volontaire après son veuvage, connue pour ses soins aux lépreux."},
-  "1-17":{n:"Roseline",s:"🌹",h:"Prieure de la chartreuse de La Celle-Roubaud (Var), mystique du XIVe siècle, dont la dépouille est conservée incorruptible."},
-  "1-21":{n:"Agnès",s:"🐑",h:"Martyre romaine de 13 ans, refusa de renier sa foi et d'épouser le fils d'un préfet. Symbole de pureté."},
-  "1-22":{n:"Vincent",s:"🍇",h:"Diacre de Saragosse, martyr espagnol du IVe siècle. Patron des vignerons — sa fête annonce le printemps."},
-  "1-24":{n:"François de Sales",s:"✍️",h:"Évêque de Genève, il convertit des milliers de calvinistes par la douceur. Patron des journalistes."},
-  "1-25":{n:"Paul",s:"⚔️",h:"Converti sur le chemin de Damas, apôtre des nations, auteur de 14 épîtres fondatrices du christianisme."},
-  "1-28":{n:"Thomas d'Aquin",s:"📚",h:"Dominicain du XIIIe siècle, géant de la théologie scolastique. La Somme théologique reste une référence majeure."},
-  "2-2":{n:"Présentation",s:"🕊️",h:"Fête de la Présentation de Jésus au Temple, quarante jours après Noël. Anciennement fête des chandelles."},
-  "2-3":{n:"Blaise",s:"🕯️",h:"Évêque de Sébaste, martyr du IVe siècle. Invoqué contre les maux de gorge — tradition de la bénédiction à la Chandeleur."},
-  "2-5":{n:"Agathe",s:"🍞",h:"Martyre sicilienne du IIIe siècle, patronne des nourrices et des fondeurs de cloches. Fêtée à Catane."},
-  "2-14":{n:"Valentin",s:"❤️",h:"Prêtre romain du IIIe siècle, aurait célébré des mariages en secret malgré leur interdiction par l'Empereur."},
-  "2-18":{n:"Bernadette",s:"💧",h:"Jeune paysanne de Lourdes qui reçut 18 apparitions de la Vierge Marie en 1858. Le sanctuaire accueille 6 millions de pèlerins par an."},
-  "3-3":{n:"Guénolé",s:"⚓",h:"Abbé breton du Ve siècle, fondateur de l'abbaye de Landévennec. Figure centrale du christianisme celtique."},
-  "3-4":{n:"Casimir",s:"👑",h:"Prince polonais du XVe siècle, refusa la couronne de Hongrie par souci de paix. Patron de la Pologne et de la Lituanie."},
-  "3-6":{n:"Colette",s:"🌸",h:"Réformatrice de l'ordre des Clarisses au XVe siècle, fondatrice de 17 couvents en France et aux Pays-Bas."},
-  "3-17":{n:"Patrick",s:"☘️",h:"Évangélisateur de l'Irlande au Ve siècle, il aurait chassé les serpents de l'île selon la légende. Patron des Irlandais."},
-  "3-19":{n:"Joseph",s:"🔨",h:"Charpentier de Nazareth, époux de Marie, père adoptif de Jésus. Patron des travailleurs et de l'Église universelle."},
-  "3-25":{n:"Annonciation",s:"🌺",h:"Fête de l'annonce faite à Marie par l'ange Gabriel de la naissance du Christ. Neuf mois avant Noël."},
-  "4-3":{n:"Richard",s:"🦁",h:"Évêque de Chichester au XIIIe siècle, connu pour sa charité envers les pauvres et son refus des richesses."},
-  "4-4":{n:"Isidore",s:"📖",h:"Archevêque de Séville au VIIe siècle, encyclopédiste universel. Proposé comme patron de l'Internet par l'Église."},
-  "4-7":{n:"J-B de la Salle",s:"🏫",h:"Fondateur des Frères des Écoles chrétiennes au XVIIe siècle, pionnier de l'enseignement gratuit pour les pauvres."},
-  "4-23":{n:"Georges",s:"🐉",h:"Soldat romain martyr du IVe siècle. La légende du dragon terrrassé en fait le symbole du bien contre le mal."},
-  "4-25":{n:"Marc",s:"✍️",h:"Évangéliste, auteur du plus court des quatre Évangiles. Patron de Venise dont la basilique abrite ses reliques."},
-  "4-29":{n:"Cath. de Sienne",s:"🌹",h:"Mystique du XIVe siècle, docteure de l'Église, elle convainquit le pape Grégoire XI de quitter Avignon pour Rome."},
-  "5-1":{n:"Fête du Travail",s:"⚒️",h:"Journée internationale des travailleurs commémorant les martyrs de Chicago de 1886 qui réclamaient la journée de 8 heures."},
-  "5-8":{n:"Victoire 1945",s:"🕊️",h:"Anniversaire de la capitulation de l'Allemagne nazie le 8 mai 1945, fin de la Seconde Guerre mondiale en Europe."},
-  "5-15":{n:"Denise",s:"🌷",h:"Du nom de saint Denis, évangélisateur de Paris. Denise est la forme féminine popularisée en France au Moyen Âge."},
-  "5-25":{n:"Sophie",s:"💡",h:"Du grec Sophia (sagesse). Sainte Sophie est la dédicataire de la grande basilique de Constantinople (Hagia Sophia)."},
-  "6-1":{n:"Justin",s:"⚖️",h:"Philosophe chrétien du IIe siècle, premier grand apologiste de la foi face aux empereurs romains. Martyr à Rome."},
-  "6-2":{n:"Blandine",s:"🦁",h:"Esclave lyonnaise martyrisée en 177 lors des persécutions de Marc Aurèle. Symbole de courage et de foi inébranlable."},
-  "6-13":{n:"Antoine de Padoue",s:"🌸",h:"Franciscain portugais du XIIIe siècle, docteur de l'Église, patron des objets perdus et des pauvres. Saint le plus populaire."},
-  "6-24":{n:"Jean-Baptiste",s:"💧",h:"Précurseur du Christ, il prêcha le repentir et baptisa dans le Jourdain. Sa naissance est fêtée six mois avant Noël."},
-  "6-27":{n:"Fernand",s:"⚔️",h:"Du germanique « Ferdinand », guerrier courageux. Saint Ferdinand III de Castille reconquit Séville sur les Maures en 1248."},
-  "6-29":{n:"Pierre et Paul",s:"⛪",h:"Les deux piliers de l'Église : Pierre, le premier pape, et Paul, l'apôtre des nations. Tous deux martyrisés à Rome."},
-  "7-3":{n:"Thomas",s:"🖐️",h:"Apôtre qui douta de la Résurrection jusqu'à toucher les plaies du Christ. Évangélisateur de l'Inde selon la tradition."},
-  "7-11":{n:"Benoît",s:"⚓",h:"Fondateur du monachisme occidental au VIe siècle. Sa Règle a façonné l'Europe médiévale. Patron de l'Europe."},
-  "7-14":{n:"Fête Nationale",s:"🇫🇷",h:"Commémoration de la prise de la Bastille le 14 juillet 1789, symbole de la Révolution française et des libertés républicaines."},
-  "7-22":{n:"Marie-Madeleine",s:"💐",h:"Première témoin de la Résurrection selon l'Évangile. Figure de la pénitente et de l'amour fidèle. Ses reliques sont à Vézelay."},
-  "7-25":{n:"Jacques",s:"🐚",h:"Apôtre, frère de Jean, premier martyr parmi les Douze. Son tombeau à Saint-Jacques-de-Compostelle est le plus grand pèlerinage d'Europe."},
-  "8-4":{n:"J-M Vianney",s:"⛪",h:"Curé d'Ars au XIXe siècle, passait 16h par jour au confessionnal. Des milliers de pèlerins venaient de toute l'Europe."},
-  "8-10":{n:"Laurent",s:"🔥",h:"Diacre romain martyrisé sur un gril en 258. Selon la tradition, il dit à ses bourreaux : « Retournez-moi, je suis cuit d'un côté »."},
-  "8-11":{n:"Claire",s:"☀️",h:"Fondatrice des Clarisses au XIIIe siècle, première femme à avoir écrit une règle monastique approuvée par le pape."},
-  "8-13":{n:"Hippolyte",s:"⚓",h:"Prêtre romain du IIIe siècle, antipape puis réconcilié avec l'Église avant d'être martyrisé en Sardaigne."},
-  "8-15":{n:"Assomption",s:"🌟",h:"Fête de la montée au ciel de la Vierge Marie, corps et âme, définie comme dogme par Pie XII en 1950."},
-  "8-20":{n:"Bernard",s:"🐝",h:"Abbé de Clairvaux au XIIe siècle, fondateur de 163 monastères, prédicateur de la 2e Croisade. Docteur de l'Église."},
-  "8-24":{n:"Barthélemy",s:"🌍",h:"Apôtre évangélisateur de l'Arménie et de l'Inde. Martyrisé par écorchement vif. Patron des bouchers et relieurs."},
-  "8-25":{n:"Louis",s:"⚜️",h:"Roi de France Louis IX, mena deux Croisades, fonda la Sainte-Chapelle. Canonisé en 1297. Seul roi de France saint."},
-  "8-28":{n:"Augustin",s:"📖",h:"Évêque d'Hippone, ses Confessions et La Cité de Dieu ont forgé la théologie occidentale. Docteur de la Grâce."},
-  "9-3":{n:"Grégoire le Grand",s:"🕊️",h:"Pape au VIe siècle, réformateur liturgique (chant grégorien), évangélisateur de l'Angleterre. Docteur de l'Église."},
-  "9-8":{n:"Nativité de Marie",s:"🌹",h:"Fête de la naissance de la Vierge Marie, neuf mois après l'Immaculée Conception (8 décembre). Grande fête mariale."},
-  "9-14":{n:"La Ste Croix",s:"✝️",h:"Exaltation de la Sainte Croix, célébrant le retour à Jérusalem de la relique emportée par les Perses en 614."},
-  "9-21":{n:"Matthieu",s:"✍️",h:"Publicain converti, évangéliste. Son Évangile, le plus liturgique, est le premier des quatre dans le Nouveau Testament."},
-  "9-29":{n:"Michel",s:"⚔️",h:"Archange guerrier, chef des armées célestes qui terrassa Satan. Patron de la France, de la police et des militaires."},
-  "10-1":{n:"Thérèse",s:"🌹",h:"Carmélite de Lisieux, morte à 24 ans en 1897. Sa « petite voie » spirituelle en fait l'une des saintes les plus populaires."},
-  "10-4":{n:"François d'Assise",s:"🕊️",h:"Fondateur des Franciscains, il renonça à sa fortune, prêcha la pauvreté et composa le Cantique des créatures."},
-  "10-15":{n:"Thérèse d'Avila",s:"✍️",h:"Carmélite espagnole du XVIe siècle, première femme docteure de l'Église. Réformatrice et mystique visionnaire."},
-  "10-18":{n:"Luc",s:"🎨",h:"Médecin grec, auteur du 3e Évangile et des Actes. La tradition en fait aussi le premier peintre de la Vierge Marie."},
-  "11-1":{n:"Toussaint",s:"🌟",h:"Fête de tous les saints, connus et inconnus. Instituée au IXe siècle pour honorer collectivement tous les bienheureux."},
-  "11-11":{n:"Armistice",s:"🕊️",h:"Signature de l'armistice de la Première Guerre mondiale le 11 novembre 1918 à 11h. La « Der des Ders »."},
-  "11-17":{n:"Élisabeth",s:"💝",h:"Princesse hongroise du XIIIe siècle, renommée pour sa charité envers les pauvres. Légende de la corbeille de pain transformée en roses."},
-  "11-22":{n:"Cécile",s:"🎵",h:"Martyre romaine du IIe siècle. La tradition la représente jouant de l'orgue au moment de sa mort. Patronne des musiciens."},
-  "11-25":{n:"Catherine",s:"⚙️",h:"Martyre alexandrine du IVe siècle, disputant avec les philosophes du palais. Patronne des étudiants et philosophes."},
-  "11-30":{n:"André",s:"🐟",h:"Premier apôtre appelé par Jésus, frère de Pierre. Crucifié sur une croix en X. Patron de l'Écosse et de la Russie."},
-  "12-3":{n:"François-Xavier",s:"🌍",h:"Jésuite espagnol du XVIe siècle, évangélisateur de l'Inde, du Japon et de la Chine. Co-fondateur de la Compagnie de Jésus."},
-  "12-4":{n:"Barbara",s:"🏰",h:"Martyre du IIIe siècle, enfermée dans une tour par son père. Patronne des artilleurs, mineurs et pompiers."},
-  "12-6":{n:"Nicolas",s:"🎁",h:"Évêque de Myre (IVe s.), patron des enfants. Sa générosité légendaire a donné naissance au personnage du Père Noël."},
-  "12-8":{n:"Immaculée Conception",s:"🌹",h:"Dogme défini en 1854 par Pie IX : Marie a été conçue sans péché originel. Quatre ans après, elle se révèle à Lourdes."},
-  "12-13":{n:"Lucie",s:"💡",h:"Martyre sicilienne du IVe siècle, refusa un mariage forcé. Fête au solstice d'hiver, elle incarne la lumière revenue."},
-  "12-25":{n:"Noël",s:"⭐",h:"Naissance de Jésus-Christ à Bethléem selon les Évangiles. La date du 25 décembre fut fixée au IVe siècle par l'Église de Rome."},
-  "12-26":{n:"Étienne",s:"✝️",h:"Premier martyr chrétien lapidé à Jérusalem. Saul de Tarse (futur Paul) était parmi ceux qui approuvèrent son exécution."},
-  "12-27":{n:"Jean",s:"❤️",h:"L'apôtre bien-aimé, auteur du 4e Évangile et de l'Apocalypse. Seul des Douze à ne pas avoir été martyrisé."},
-  "12-28":{n:"Innocents",s:"😇",h:"Mémoire des enfants de Bethléem massacrés par Hérode. Premiers martyrs involontaires, « boutons de rose de martyrs »."},
-  "12-31":{n:"Sylvestre",s:"🎉",h:"Pape sous Constantin, pendant le Concile de Nicée (325). Sa fête coïncide avec la fin de l'année civile."}
-};
+let SAINTS_DATA = null;
 
-// Fallback pour jours sans entrée spécifique
-function getSaint(m, d) {
+// Charge le fichier JSON une seule fois au premier appel
+async function getSaint(m, d) {
+  if (!SAINTS_DATA) {
+    try {
+      // Remplacez 'saints.json' par le chemin réel de votre fichier
+      const response = await fetch('saints.json');
+      SAINTS_DATA = await response.json();
+    } catch (error) {
+      console.error("Erreur lors du chargement des saints :", error);
+      return { n: '—', s: '✨', h: 'Erreur de chargement du calendrier.' };
+    }
+  }
+
   const key = `${m}-${d}`;
-  return SAINTS[key] || { n: '—', s: '✨', h: 'Un saint ou une sainte du calendrier catholique.' };
+  return SAINTS_DATA[key] || { n: '—', s: '✨', h: 'Un saint ou une sainte du calendrier catholique.' };
 }
 
 // ── Horoscope ──
