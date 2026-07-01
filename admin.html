@@ -37,6 +37,7 @@
     .btn-danger{background:var(--danger);color:#fff;}
     .btn-danger:hover{opacity:.85;}
     .btn-sm{padding:7px 14px;font-size:13px;}
+    .btn:disabled{opacity:.5;cursor:not-allowed;}
     .btn-google{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 20px;border-radius:8px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .2s;background:#fff;color:#1f2937;border:1px solid #d1d5db;margin-bottom:4px;}
     .btn-google:hover{background:#f9fafb;border-color:#9ca3af;}
     .auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--muted);font-size:12px;}
@@ -141,6 +142,9 @@
     .sa-empty{font-size:14px;color:var(--muted);text-align:center;padding:32px;}
     .badge-override{display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#fcd34d;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;}
 
+    /* SUBSCRIPTION */
+    .sub-plan-card{transition:opacity .2s,filter .2s;}
+
     /* TOAST */
     .toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:14px;z-index:300;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none;}
     .toast.show{transform:translateY(0);opacity:1;}
@@ -205,6 +209,7 @@
     </div>
     <div class="topbar-right">
       <span class="user-badge" id="user-email-badge"></span>
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('subscription')">💳 Abonnement</button>
       <button class="btn btn-secondary btn-sm" id="sa-topbar-btn" style="display:none" onclick="showScreen('superadmin')">⚙️ Super Admin</button>
       <button class="btn btn-secondary btn-sm" onclick="doLogout()">Déconnexion</button>
     </div>
@@ -367,6 +372,61 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- ══ ÉCRAN : Abonnement ══ -->
+    <div id="screen-subscription" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="showScreen('stores')">← Mes établissements</button>
+        <h2 style="font-size:20px;font-weight:700">💳 Mon abonnement</h2>
+      </div>
+
+      <div id="intent-banner-sub" class="plan-limit-banner" style="display:none;border-color:var(--accent);background:rgba(99,102,241,.12);color:var(--accent2)">
+        ✅ Vous aviez choisi un abonnement avant de vous connecter.
+        <a onclick="resumeStripeIntent()">Cliquer ici pour finaliser le paiement →</a>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+        <!-- Freemium -->
+        <div class="sub-plan-card" data-plan="freemium" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px">
+          <p style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Gratuit</p>
+          <div style="font-size:2rem;font-weight:700;margin-bottom:4px">0€ <span style="font-size:.85rem;font-weight:300;color:var(--muted)">/ mois</span></div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;margin:14px 0 18px;font-size:13px;color:var(--muted)">
+            <li>✓ 1 établissement</li>
+            <li>✓ 3 slides</li>
+            <li>✓ 64 combinaisons visuelles</li>
+          </ul>
+          <button class="btn btn-secondary sub-plan-btn" style="width:100%" disabled>Plan actuel</button>
+        </div>
+        <!-- Commerce -->
+        <div class="sub-plan-card" data-plan="commerce" style="background:var(--bg);border:1px solid var(--accent);border-radius:12px;padding:22px;position:relative">
+          <div class="sub-plan-badge" style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:11px;font-weight:600;padding:2px 12px;border-radius:20px;white-space:nowrap">⭐ Le plus populaire</div>
+          <p style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Commerce</p>
+          <div id="sub-price-commerce" style="font-size:2rem;font-weight:700;margin-bottom:4px">5€ <span style="font-size:.85rem;font-weight:300;color:var(--muted)">/ mois</span></div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;margin:14px 0 18px;font-size:13px;color:var(--muted)">
+            <li>✓ 1 établissement</li>
+            <li>✓ 10 slides</li>
+            <li>✓ Météo &amp; horoscope</li>
+            <li>✓ 64 combinaisons visuelles</li>
+          </ul>
+          <button class="btn btn-primary sub-plan-btn" style="width:100%" onclick="goToStripe('commerce')">Choisir Commerce →</button>
+        </div>
+        <!-- Pro -->
+        <div class="sub-plan-card" data-plan="pro" style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:22px">
+          <p style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Pro</p>
+          <div id="sub-price-pro" style="font-size:2rem;font-weight:700;margin-bottom:4px">12€ <span style="font-size:.85rem;font-weight:300;color:var(--muted)">/ mois</span></div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;margin:14px 0 18px;font-size:13px;color:var(--muted)">
+            <li>✓ Établissements illimités</li>
+            <li>✓ 10 slides</li>
+            <li>✓ Météo &amp; horoscope</li>
+            <li>✓ Support prioritaire</li>
+          </ul>
+          <button class="btn btn-secondary sub-plan-btn" style="width:100%" onclick="goToStripe('pro')">Choisir Pro →</button>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:16px;text-align:center">
+        🔒 Paiement sécurisé par Stripe · Résiliation à tout moment · Activation automatique
+      </p>
     </div>
 
     <!-- ══ ÉCRAN : Super Admin ══ -->
@@ -534,6 +594,10 @@ let editingSlideIdx = -1;
 let userLimits      = { maxSlides: FREE_MAX_SLIDES, maxStores: FREE_MAX_STORES };
 let isSuperAdmin    = false;
 let stripeLinks     = { commerce: '', pro: '' };
+let currentPlan     = 'freemium';   // 'freemium' | 'commerce' | 'pro'
+
+const PLAN_LEVEL = { freemium: 0, commerce: 1, pro: 2 };
+const pendingIntentPlan = new URLSearchParams(location.search).get('intent'); // 'commerce' | 'pro' | null
 
 // ── AUTH ──
 window.doLogin = async () => {
@@ -581,8 +645,21 @@ onAuthStateChanged(auth, async user => {
     await loadUserLimits();
     await loadStripeLinks();
     loadStores();
-    showScreen('stores');
     set(ref(db, `userIndex/${user.uid}`), user.email);
+
+    // ── Reprise d'intention Stripe (venant d'index.html) ──
+    if (pendingIntentPlan === 'commerce' || pendingIntentPlan === 'pro') {
+      history.replaceState(null, '', 'admin.html'); // nettoie l'URL, pas de re-proposition au refresh
+      showScreen('subscription');
+      const banner = document.getElementById('intent-banner-sub');
+      if (banner) {
+        banner.querySelector('a').textContent =
+          `Cliquer ici pour finaliser votre abonnement ${pendingIntentPlan === 'commerce' ? 'Commerce' : 'Pro'} →`;
+        banner.style.display = 'block';
+      }
+    } else {
+      showScreen('stores');
+    }
   }
 });
 
@@ -594,8 +671,10 @@ async function loadUserLimits() {
     const d = snap.val();
     userLimits.maxSlides = d.maxSlides ?? FREE_MAX_SLIDES;
     userLimits.maxStores = d.maxStores ?? FREE_MAX_STORES;
+    currentPlan = d.plan || 'freemium';
   } else {
-    userLimits = { maxSlides: FREE_MAX_SLIDES, maxStores: FREE_MAX_STORES };
+    userLimits  = { maxSlides: FREE_MAX_SLIDES, maxStores: FREE_MAX_STORES };
+    currentPlan = 'freemium';
   }
 }
 
@@ -638,6 +717,54 @@ window.showUpgradePanel = () => {
 
 window.hideUpgradePanel = () => {
   document.getElementById('upgrade-panel').style.display = 'none';
+};
+
+// ── ABONNEMENT (CTA permanent, écran dédié) ──
+function loadSubscriptionPrices() {
+  get(ref(db, 'config/stripe')).then(snap => {
+    if (!snap.exists()) return;
+    const d  = snap.val();
+    const pc = document.getElementById('sub-price-commerce');
+    const pp = document.getElementById('sub-price-pro');
+    if (pc && d.priceCommerce !== undefined)
+      pc.innerHTML = `${d.priceCommerce}€ <span style="font-size:.85rem;font-weight:300;color:var(--muted)">/ mois</span>`;
+    if (pp && d.pricePro !== undefined)
+      pp.innerHTML = `${d.pricePro}€ <span style="font-size:.85rem;font-weight:300;color:var(--muted)">/ mois</span>`;
+  });
+}
+
+function refreshSubscriptionCTA() {
+  const myLevel = PLAN_LEVEL[currentPlan] ?? 0;
+  document.querySelectorAll('.sub-plan-card').forEach(card => {
+    const plan  = card.dataset.plan;
+    const level = PLAN_LEVEL[plan];
+    const btn   = card.querySelector('.sub-plan-btn');
+    const isCurrent = plan === currentPlan;
+
+    if (level <= myLevel) {
+      // Plan déjà inclus dans l'abonnement actuel → grisé
+      card.style.opacity = '0.5';
+      card.style.pointerEvents = 'none';
+      btn.disabled = true;
+      btn.textContent = isCurrent ? 'Plan actuel' : 'Déjà inclus';
+      btn.className = 'btn btn-secondary sub-plan-btn';
+    } else {
+      // Plan supérieur → cliquable
+      card.style.opacity = '1';
+      card.style.pointerEvents = 'auto';
+      btn.disabled = false;
+      btn.textContent = plan === 'commerce' ? 'Choisir Commerce →' : 'Choisir Pro →';
+      btn.className  = plan === 'commerce' ? 'btn btn-primary sub-plan-btn' : 'btn btn-secondary sub-plan-btn';
+    }
+  });
+}
+
+window.resumeStripeIntent = () => {
+  if (pendingIntentPlan === 'commerce' || pendingIntentPlan === 'pro') {
+    goToStripe(pendingIntentPlan);
+  }
+  const banner = document.getElementById('intent-banner-sub');
+  if (banner) banner.style.display = 'none';
 };
 
 // ── STORES ──
@@ -723,12 +850,13 @@ window.openStore = (id, data) => {
 
 // ── NAVIGATION ──
 window.showScreen = (name) => {
-  ['stores','editor','superadmin'].forEach(s => {
+  ['stores','editor','superadmin','subscription'].forEach(s => {
     const el = document.getElementById(`screen-${s}`);
     if (el) el.style.display = (s === name) ? 'block' : 'none';
   });
-  if (name === 'stores') { currentStore = null; loadStores(); }
-  if (name === 'superadmin') { saLoadAllStores(); saLoadOverrides(); saLoadStripe(); }
+  if (name === 'stores')       { currentStore = null; loadStores(); }
+  if (name === 'superadmin')   { saLoadAllStores(); saLoadOverrides(); saLoadStripe(); }
+  if (name === 'subscription') { loadSubscriptionPrices(); refreshSubscriptionCTA(); }
 };
 
 window.saveAll = async () => {
