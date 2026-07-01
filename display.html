@@ -128,26 +128,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-// ── Saints + histoire + symbole ──
+// Variable globale pour stocker le JSON des saints une fois chargé
 let SAINTS_DATA = null;
 
-// Charge le fichier JSON une seule fois au premier appel
-async function getSaint(m, d) {
+// Fonction asynchrone qui calcule la date du jour et récupère le saint dans le JSON distant
+async function getSaint() {
+  const now = new Date();
+  const m = now.getMonth() + 1;
+  const d = now.getDate();
+  const key = `${m}-${d}`;
+
   if (!SAINTS_DATA) {
     try {
-      // Remplacez 'saints.json' par le chemin réel de votre fichier
+      // Remplacez 'saints.json' par le chemin exact de votre fichier si nécessaire
       const response = await fetch('saints.json');
       SAINTS_DATA = await response.json();
     } catch (error) {
-      console.error("Erreur lors du chargement des saints :", error);
+      console.error("Erreur lors du chargement de saints.json :", error);
       return { n: '—', s: '✨', h: 'Erreur de chargement du calendrier.' };
     }
   }
 
-  const key = `${m}-${d}`;
   return SAINTS_DATA[key] || { n: '—', s: '✨', h: 'Un saint ou une sainte du calendrier catholique.' };
 }
-
 // ── Horoscope ──
 const HOROSCOPES = {
   belier:    {sign:"♈",name:"Bélier",    dates:"21 mars – 19 avril",   texts:["Votre énergie est au sommet. C'est le moment d'initier de nouveaux projets et de faire confiance à votre instinct.","Les planètes favorisent vos ambitions. Restez concentré sur l'essentiel et n'hésitez pas à prendre des initiatives.","Une journée propice aux rencontres et aux échanges. Votre charme naturel ouvre des portes inattendues."]},
