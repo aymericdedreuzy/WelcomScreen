@@ -225,8 +225,7 @@ async function buildSlideHTML(s) {
               <div class="clock-date" id="clock-date"></div>`;
 
     case 'ephemeris': {
-      const m = now.getMonth()+1, d = now.getDate();
-      const saint = getSaint(m, d);
+      const saint = await getSaint(); // Appel asynchrone sans paramètres, gère la date actuelle
       const dateStr = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
       return `<div class="ephem-symbol">${saint.s}</div>
               <div class="ephem-label">Aujourd'hui nous fêtons</div>
