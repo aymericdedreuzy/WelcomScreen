@@ -486,9 +486,10 @@ onAuthStateChanged(auth, user => {
 function goToStripe(plan) {
   const base = stripeUrls[plan];
   if (!base) return;
-  // Utilisateur non connecté → on l'envoie s'inscrire puis il reviendra via le panneau upgrade
+  // Utilisateur non connecté → on transmet le plan choisi via l'URL,
+  // il sera automatiquement repris après connexion/inscription sur admin.html
   if (!currentUid) {
-    window.location.href = 'admin.html';
+    window.location.href = `admin.html?intent=${plan}`;
     return;
   }
   const url = new URL(base);
